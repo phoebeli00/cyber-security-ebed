@@ -8,13 +8,6 @@
 }
 
 .course-navigation a {
-  color: var(--ink);
-  text-underline-offset: 3px;
-}
-
-.course-navigation [aria-current="page"],
-.course-navigation .course-back,
-.course-navigation .course-next {
   display: inline-flex;
   align-items: center;
   min-height: 36px;
