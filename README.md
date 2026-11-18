@@ -1,36 +1,21 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Student Employee Cybersecurity Onboarding Training
 
-## Getting Started
+- GitHub: https://github.com/shuos-hci/ebed_cybersecurity
+- Vercel project: https://vercel.com/shuo-is-the-best/ebed_cybersecurity
+- Production: https://ebedcybersecurity.vercel.app/
+- Production branch: `main`
 
-First, run the development server:
+## Edit and preview
 
-```bash
+The complete interactive course is in `public/training.html`. It was migrated from the existing Claude Code artifact, retaining its content, styles, scripts, and pixel illustrations. The home URL rewrites to this file without changing the address.
+
+```sh
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000. Before pushing, run `npm run build`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Push changes to `main` to trigger the existing Vercel production deployment.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Open this repository folder in VS Code. The installed Claude Code and Codex extensions remain available; they do not need to be copied into the repository. Existing conversations in the original window remain there. Start future project work in this folder and edit `public/training.html`, rather than the previous temporary artifact.

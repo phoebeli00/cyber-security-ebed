@@ -1,0 +1,1139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Student employee cybersecurity onboarding: consequences and contextual pressure.">
+<style>html{padding:0}body{margin:0}[hidden]{display:none!important}</style>
+<title>Student Employee Cybersecurity Onboarding Training</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Pixelify+Sans:wght@400..700&display=swap">
+<!--
+  DEVELOPER NOTES (not shown to students)
+  LO1 — Explain potential consequences of unsafe actions and recognize contextual cues that increase risk.
+    - Practice Q2 → recognizing contextual cues
+    - Practice Q4 and the Reflection sentence → identifying and explaining consequences
+  Correct answers are stored in the PRACTICE data below (`correct` index). Option markup is identical
+  before a selection so nothing signals the answer.
+  Illustrations: every sprite is drawn on one pixel grid (PX = 4 CSS px per cell) and rendered from
+  character maps, so icons and scenes share the same pixel size.
+-->
+<style>
+  /* Layout concept: a campus-training page. Charcoal title bar with a red rule, light-gray ground,
+     white work surfaces with thin borders. Pixel art appears as one scene on the intro page and as
+     small icon tiles on each step. The scenario message is styled as an email and stays pinned. */
+  :root {
+    --bg: #eff0f2;
+    --surface: #ffffff;
+    --ink: #212326;
+    --muted: #51565d;
+    --line: #d2d5da;
+    --accent: #c41230;
+    --accent-ink: #ffffff;
+    --accent-deep: #8c0d24;
+    --accent-soft: #f7e7ea;
+    --hl: #fbdbe0;
+    --tile: #e9ebee;
+    --good: #1c6a41;
+    --good-soft: #e1f1e8;
+    --review: #84470a;
+    --review-soft: #fdeed8;
+    --focus: #0b5cff;
+    --bar: #26282b;
+    --font-body: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --font-deco: "Pixelify Sans", "Courier New", monospace;
+    --radius: 4px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #151618;
+      --surface: #202225;
+      --ink: #eceef0;
+      --muted: #aeb4bc;
+      --line: #3a3d42;
+      --accent: #ff6b7f;
+      --accent-ink: #1c0b0e;
+      --accent-deep: #a8283b;
+      --accent-soft: #2d2023;
+      --hl: #5b2029;
+      --good: #84d3a6;
+      --good-soft: #17301f;
+      --review: #f2bb6b;
+      --review-soft: #3a2a0f;
+      --focus: #8db8ff;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #151618;
+    --surface: #202225;
+    --ink: #eceef0;
+    --muted: #aeb4bc;
+    --line: #3a3d42;
+    --accent: #ff6b7f;
+    --accent-ink: #1c0b0e;
+    --accent-deep: #a8283b;
+    --accent-soft: #2d2023;
+    --hl: #5b2029;
+    --good: #84d3a6;
+    --good-soft: #17301f;
+    --review: #f2bb6b;
+    --review-soft: #3a2a0f;
+    --focus: #8db8ff;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16.5px;
+    line-height: 1.6;
+  }
+  .wrap {
+    max-width: 1040px;
+    margin-inline: auto;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  h1, h2, h3 { font-weight: 700; line-height: 1.25; text-wrap: balance; margin: 0; }
+  p { margin: 0; }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  h2:focus, h3:focus { outline: none; }
+  .vh {
+    position: absolute !important; width: 1px; height: 1px; overflow: hidden;
+    clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+  }
+  svg.px { display: block; max-width: 100%; height: auto; }
+
+  /* Title bar */
+  .topbar { background: var(--bar); color: #fff; border-bottom: 4px solid var(--accent); }
+  .topbar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 12px; flex-wrap: wrap; }
+  .brand { font-size: 1.05rem; display: flex; align-items: center; gap: 12px; }
+  .brand .mark { width: 8px; height: 8px; background: #c41230; box-shadow: 12px 0 #fff, 24px 0 #9aa0a8; margin-right: 28px; flex: none; }
+  .brand small { font-family: var(--font-head); font-weight: 400; color: #c9ced4; font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; }
+  .topbar .btn.secondary { color: #fff; border-color: #fff; background: transparent; box-shadow: none; }
+  .topbar .btn.secondary:hover { background: rgba(255,255,255,0.14); }
+  .topbar :focus-visible { outline-color: #fff; }
+
+  /* Progress */
+  .progress { list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; flex-wrap: wrap; }
+  .progress li {
+    font-size: 0.85rem; color: var(--muted); padding: 4px 10px; border-radius: 2px;
+    border: 1px solid var(--line); background: var(--surface); display: flex; gap: 6px; align-items: center;
+  }
+  .progress li[aria-current="step"] { background: var(--ink); color: var(--bg); border-color: var(--ink); font-weight: 700; }
+  .progress li.done { color: var(--ink); }
+  .progress li.done::before { content: "✓"; color: var(--good); font-weight: 700; }
+  .progress-bar { padding-block: 16px 4px; }
+
+  main { padding-block: 24px 64px; }
+  section.stage { display: flex; flex-direction: column; gap: 22px; }
+
+  .eyebrow { font-family: var(--font-head); text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.82rem; color: var(--accent); margin-bottom: 4px; }
+  .stage h2 { font-size: clamp(1.65rem, 4vw, 2.2rem); }
+  .stage h2::after {
+    content: ""; display: block; height: 4px; width: 96px; margin-top: 12px;
+    background: linear-gradient(90deg, var(--accent) 0 32px, var(--ink) 32px 48px, var(--line) 48px 96px);
+  }
+  .subtitle { color: var(--muted); font-size: 1.05rem; margin-top: 8px; }
+  .prose { display: flex; flex-direction: column; gap: 12px; max-width: 68ch; }
+  .lead { max-width: 68ch; }
+  .label { font-family: var(--font-head); text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.78rem; color: var(--muted); }
+
+  .callout { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: var(--radius); padding: 14px 18px; max-width: 68ch; display: flex; flex-direction: column; gap: 4px; }
+
+  /* Buttons: flat with a pixel "press" edge */
+  .btn {
+    font: inherit; font-weight: 700; min-height: 46px; padding: 9px 20px; border-radius: var(--radius); cursor: pointer;
+    border: 2px solid var(--accent-deep); background: var(--accent); color: var(--accent-ink);
+    box-shadow: 0 3px 0 var(--accent-deep);
+  }
+  .btn:hover { filter: brightness(1.07); }
+  .btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--accent-deep); }
+  .btn.secondary { background: var(--surface); color: var(--ink); border-color: var(--ink); box-shadow: 0 3px 0 var(--line); }
+  .btn.secondary:hover { background: var(--tile); color: #212326; filter: none; }
+  .btn.secondary:active { box-shadow: 0 1px 0 var(--line); }
+  .actions { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; padding-bottom: 3px; }
+  .help-btn { min-height: 40px; padding: 5px 14px; font-size: 0.95rem; }
+  @media (prefers-reduced-motion: reduce) { .btn:active { transform: none; } }
+
+  /* Pixel art tiles */
+  .tile { flex: none; width: 64px; height: 64px; background: var(--tile); border: 1px solid var(--line); border-radius: var(--radius); display: grid; place-items: center; }
+  .tile svg.px { width: auto; height: auto; max-width: none; }
+  /* Intro page: title block, wide scene banner, then two calm columns, then instructions + action */
+  #stage-intro { gap: 32px; }
+  .intro-head h2::after { display: none; }
+  .intro-head::after {
+    content: ""; display: block; height: 4px; width: 96px; margin-top: 16px;
+    background: linear-gradient(90deg, var(--accent) 0 32px, var(--ink) 32px 48px, var(--line) 48px 96px);
+  }
+  .intro-head .subtitle { margin-top: 6px; }
+  /* The banner's floor colours match the bottom rows of the scene so the picture runs edge to edge. */
+  /* The scene is drawn on the same 4px grid as every icon (240 x 76 cells). On narrow screens the
+     banner crops to the centre of the scene, where the story happens, instead of shrinking it. */
+  .hero {
+    position: relative; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; line-height: 0;
+    background: linear-gradient(to bottom, #eceef1 0 86.8%, #9aa0a8 86.8% 88.2%, #ced2d8 88.2% 100%);
+  }
+  .hero svg.px { position: relative; left: 50%; transform: translateX(-50%); width: 960px; max-width: none; height: auto; }
+  .intro-cols { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+  .intro-text { display: flex; flex-direction: column; gap: 18px; line-height: 1.75; }
+  .intro-text p:first-child { font-size: 1.15rem; line-height: 1.65; }
+  .card-title { font-family: var(--font-head); font-weight: 400; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); margin-bottom: 8px; }
+  .callout { max-width: none; gap: 0; padding: 18px 20px; line-height: 1.7; }
+  .instructions {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 22px;
+    display: flex; gap: 24px; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  }
+  .instructions-text { display: flex; flex-direction: column; gap: 10px; flex: 1 1 360px; max-width: 68ch; line-height: 1.7; }
+  .instructions-text .card-title { margin-bottom: 0; }
+  @media (max-width: 860px) { .intro-cols { grid-template-columns: minmax(0, 1fr); gap: 24px; } }
+
+  /* Help panel */
+  .help { background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--ink); border-radius: var(--radius); margin-bottom: 20px; }
+  .help-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .help-head h2 { font-size: 1.15rem; }
+  .help-head h2::after { display: none; }
+  .help-item { border-bottom: 1px solid var(--line); }
+  .help-item:last-child { border-bottom: 0; }
+  .help-toggle {
+    width: 100%; text-align: left; font: inherit; font-weight: 700; background: none; color: var(--ink); border: 0;
+    padding: 14px 18px; min-height: 48px; cursor: pointer; display: flex; justify-content: space-between; gap: 12px; align-items: center;
+  }
+  .help-toggle:hover { background: var(--tile); color: #212326; }
+  .help-body { padding: 0 18px 16px; display: flex; flex-direction: column; gap: 10px; max-width: 70ch; }
+  .help-body dt { font-weight: 700; }
+  .help-body dd { margin: 0 0 8px; color: var(--muted); }
+  .help-body dl { margin: 0; }
+  .help-note { font-style: italic; }
+
+  /* Workspace */
+  .workspace { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 24px; align-items: start; }
+  .msg-col { position: sticky; top: 12px; z-index: 2; }
+  .scenario { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; max-width: 76ch; display: flex; gap: 16px; align-items: flex-start; }
+  .scenario .txt { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  @media (max-width: 800px) {
+    .workspace { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+    .msg-col { top: 0; padding-block: 8px; background: var(--bg); }
+    .scenario .tile { display: none; }
+  }
+
+  /* Email simulation */
+  .email { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); max-height: calc(100vh - 24px); overflow-y: auto; box-shadow: 0 3px 0 var(--line); }
+  .email-bar { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: var(--tile); border-bottom: 1px solid var(--line); color: #51565d; }
+  .email-bar .dots { display: flex; gap: 4px; }
+  .email-bar .dots i { width: 8px; height: 8px; background: #9aa0a8; display: block; }
+  .email-bar .dots i:first-child { background: #c41230; }
+  .email-bar .label { color: #51565d; }
+  .email blockquote { margin: 0; padding: 14px 16px; font-size: 1rem; }
+  @media (max-width: 800px) {
+    .email { max-height: 38vh; }
+    .email blockquote { padding: 8px 12px; font-size: 0.93rem; line-height: 1.45; }
+    .email-bar { padding: 4px 12px; }
+  }
+
+  /* Revealed annotations on the message */
+  .tag-px { display: none; }
+  .email mark { background: none; color: inherit; }
+  .show-info mark.info { background: var(--tile); color: #212326; box-shadow: inset 0 -3px 0 #212326; padding: 0 2px; }
+  .show-cues mark.cue { background: var(--hl); color: var(--ink); box-shadow: inset 0 -3px 0 var(--accent); padding: 0 2px; }
+  .show-action mark.action { outline: 2px dashed var(--ink); outline-offset: 2px; padding: 0 2px; }
+  .show-info .tag-info, .show-cues .tag-cue, .show-action .tag-action {
+    display: inline-block; font-family: var(--font-head); font-size: 0.62rem; line-height: 1; letter-spacing: 0.03em;
+    vertical-align: super; margin-left: 3px; padding: 3px 4px; background: var(--ink); color: var(--bg);
+    animation: popin 0.3s steps(4) both;
+  }
+  .show-info .tag-info { background: #212326; color: #fff; }
+  .show-cues .tag-cue { background: var(--accent); color: var(--accent-ink); }
+  @keyframes popin { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .show-info .tag-info, .show-cues .tag-cue, .show-action .tag-action, .annotations li { animation: none !important; }
+  }
+
+  /* Steps */
+  .steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .steps > li { list-style: none; }
+  .step-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; }
+  .step-card.needs-review { border-color: var(--review); box-shadow: 0 0 0 1px var(--review); }
+  .step-body { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .step-top { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .step-num { font-family: var(--font-head); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); }
+  .step-q { font-size: 1.08rem; }
+  label.step-q { display: block; font-weight: 700; }
+  .flag { font-size: 0.8rem; font-weight: 700; background: var(--review-soft); color: var(--review); border-radius: 2px; padding: 2px 8px; }
+  .answer-line { display: flex; flex-direction: column; gap: 2px; }
+  .answer-line .a { font-weight: 600; }
+  .connector {
+    display: flex; align-items: center; gap: 10px; justify-content: center; color: var(--accent); font-family: var(--font-head);
+    font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.06em; padding-block: 0 12px;
+  }
+  .connector::before, .connector::after { content: ""; flex: 1; border-top: 3px dotted var(--line); max-width: 90px; }
+
+  .toggle {
+    align-self: flex-start; font: inherit; font-weight: 700; color: var(--ink); background: var(--surface); border: 2px solid var(--ink);
+    border-radius: var(--radius); min-height: 42px; padding: 5px 14px; cursor: pointer; display: inline-flex; gap: 8px; align-items: center;
+    box-shadow: 0 3px 0 var(--line);
+  }
+  .toggle:hover { background: var(--tile); color: #212326; }
+  .toggle .chev { display: inline-block; font-family: var(--font-head); color: var(--accent); transition: transform 0.15s steps(3); }
+  .toggle:hover .chev { color: var(--accent-deep); }
+  .toggle[aria-expanded="true"] .chev { transform: rotate(90deg); }
+  @media (prefers-reduced-motion: reduce) { .toggle .chev { transition: none; } }
+  .reason { border-top: 1px solid var(--line); padding-top: 12px; display: flex; flex-direction: column; gap: 10px; }
+  .reason .quote { font-style: italic; border-left: 4px solid var(--accent); padding-left: 14px; }
+  .support { color: var(--muted); }
+  .annotations { list-style: none; padding: 0; margin: 4px 0 0; display: flex; flex-direction: column; gap: 8px; }
+  .annotations li { display: flex; gap: 10px; align-items: baseline; animation: popin 0.3s steps(4) both; animation-delay: calc(var(--i, 0) * 140ms); }
+  .annotations .tag {
+    flex: none; font-family: var(--font-head); font-size: 0.68rem; background: var(--ink); color: var(--bg);
+    padding: 3px 5px; min-width: 22px; text-align: center;
+  }
+  .annotations .tag.t-cue { background: var(--accent); color: var(--accent-ink); }
+  .annotations .src { font-weight: 700; }
+
+  .together { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--ink); border-radius: var(--radius); padding: 16px 18px; display: flex; flex-direction: column; gap: 6px; max-width: 76ch; }
+
+  /* Practice controls */
+  select {
+    font: inherit; width: 100%; min-height: 48px; padding: 8px 12px; border-radius: var(--radius); border: 2px solid var(--line);
+    background: var(--surface); color: var(--ink);
+  }
+  select:hover { border-color: var(--ink); }
+  .feedback { display: flex; gap: 10px; align-items: flex-start; border-radius: var(--radius); padding: 10px 12px; }
+  .feedback:empty { display: none; }
+  .feedback.good { background: var(--good-soft); border: 1px solid var(--good); }
+  .feedback.review { background: var(--review-soft); border: 1px solid var(--review); }
+  .chip { flex: none; font-size: 0.78rem; font-weight: 700; border-radius: 2px; padding: 2px 8px; white-space: nowrap; }
+  .good .chip { background: var(--good); color: var(--bg); }
+  .review .chip { background: var(--review); color: var(--bg); }
+  .status { font-weight: 700; padding: 12px 14px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); max-width: 76ch; }
+  .status:empty { display: none; }
+
+  /* Reflection */
+  textarea {
+    font: inherit; width: 100%; min-height: 120px; padding: 12px; border-radius: var(--radius); border: 2px solid var(--line);
+    background: var(--surface); color: var(--ink); resize: vertical;
+  }
+  textarea[aria-invalid="true"] { border-color: var(--review); }
+  .field { display: flex; flex-direction: column; gap: 8px; max-width: 76ch; }
+  .field label { font-weight: 700; }
+  .error { color: var(--review); font-weight: 700; }
+  .error:empty { display: none; }
+  .prompt-row { display: flex; gap: 16px; align-items: flex-start; }
+  .example-answer { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--good); border-radius: var(--radius); padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; max-width: 76ch; }
+  .example-answer h3 { font-size: 1.05rem; }
+  .checks { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+  .checks label { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; }
+  .checks input { width: 22px; height: 22px; margin-top: 2px; flex: none; accent-color: var(--accent); }
+  .five-q { margin: 0; padding-left: 1.4em; display: flex; flex-direction: column; gap: 6px; font-weight: 700; }
+  .five-q-box { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 20px; flex: 1 1 280px; max-width: 460px; }
+  .done-row { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; }
+  .done-art { display: flex; gap: 12px; align-items: flex-end; }
+  @media (max-width: 520px) {
+    .step-card { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+    .step-card .tile { width: 52px; height: 52px; }
+    .step-card .tile svg.px { transform: scale(0.75); }
+    .prompt-row .tile { display: none; }
+  }
+
+  /* ---------- Type system ----------
+     Inter carries everything people read or act on: page and section titles, stage names, buttons,
+     labels, body text. Pixelify Sans is decoration only: the small "STEP n" badges and annotation tags. */
+  :root {
+    --font-head: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --radius: 12px; --radius-lg: 18px;
+    --shadow: 0 1px 2px rgba(16, 18, 24, 0.06), 0 10px 28px rgba(16, 18, 24, 0.07);
+  }
+  body { font-family: var(--font-body); font-size: 1.0625rem; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+  h1, h2, h3 { font-family: var(--font-head); font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; }
+  .stage h2 { font-size: clamp(1.9rem, 4.5vw, 2.6rem); }
+  .brand { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.01em; }
+  .brand small { font-family: var(--font-body); font-weight: 600; font-size: 0.82rem; text-transform: none; letter-spacing: 0; border-radius: 999px; padding: 3px 12px; }
+  .eyebrow, .card-title, .label, .connector { font-family: var(--font-head); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+  .eyebrow, .card-title, .connector { font-size: 0.85rem; }
+  .step-num, .tag, .tag-px { font-family: var(--font-deco); font-weight: 500; }
+  .step-num { font-size: 0.9rem; }
+  .step-q { font-family: var(--font-body); font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
+  .subtitle { font-family: var(--font-body); }
+  .help-head h2 { font-size: 1.3rem; }
+  .example-answer h3, .prose h3 { font-size: 1.25rem; }
+  .intro-text p:first-child { font-size: 1.2rem; }
+  .btn, .toggle, .help-toggle, .progress li { font-family: var(--font-head); font-weight: 600; letter-spacing: 0; }
+  .btn, .toggle, .help-toggle { font-size: 1rem; }
+
+  /* ---------- Modern surface layer ---------- */
+  .topbar { border-bottom-width: 3px; }
+  .progress li { border-radius: 999px; padding: 6px 14px; font-size: 0.9rem; }
+  .btn { border: 1px solid var(--accent-deep); border-radius: 10px; min-height: 48px; padding: 10px 22px; box-shadow: 0 1px 2px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.22); transition: transform 0.12s, box-shadow 0.12s; }
+  .btn:hover { filter: none; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(196,18,48,0.28), inset 0 1px 0 rgba(255,255,255,0.22); }
+  .btn:active { transform: none; box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+  .btn.secondary { background: var(--surface); color: var(--ink); border: 1px solid var(--line); box-shadow: 0 1px 2px rgba(16,18,24,0.08); }
+  .btn.secondary:hover { background: var(--tile); color: #212326; box-shadow: 0 4px 12px rgba(16,18,24,0.1); }
+  .topbar .btn.secondary { background: transparent; color: #fff; border-color: rgba(255,255,255,0.55); box-shadow: none; }
+  .topbar .btn.secondary:hover { background: rgba(255,255,255,0.14); box-shadow: none; }
+  .toggle { border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 1px 2px rgba(16,18,24,0.08); }
+  .toggle:hover { box-shadow: 0 4px 12px rgba(16,18,24,0.1); }
+  @media (prefers-reduced-motion: reduce) { .btn, .btn:hover { transition: none; transform: none; } }
+
+  .step-card, .email, .scenario, .status, .example-answer, .five-q-box, .instructions, .help, .together, .callout { border-radius: var(--radius-lg); }
+  .step-card, .email, .scenario, .example-answer, .five-q-box, .instructions, .help { box-shadow: var(--shadow); border-color: var(--line); }
+  .callout { background: var(--accent-soft); border: 0; padding: 20px 22px; }
+  .together { border: 1px solid var(--line); background: var(--surface); box-shadow: var(--shadow); }
+  .status { border: 1px solid var(--line); box-shadow: var(--shadow); }
+  .example-answer { border: 1px solid var(--good); }
+  .help { border-top-width: 1px; }
+  .tile { border-radius: 14px; background: linear-gradient(160deg, #f6f7f9, #e3e6ea); border-color: #d9dce1; }
+  select, textarea { border-radius: 10px; border-width: 1px; border-color: var(--line); }
+  select:hover { border-color: var(--ink); }
+  .feedback { border-radius: 12px; }
+  .email { box-shadow: var(--shadow); }
+  .email-bar { background: linear-gradient(#f3f4f6, #e9ebee); }
+
+  /* Intro: illustration banner */
+  .hero {
+    border-radius: 22px; box-shadow: 0 2px 4px rgba(16,18,24,0.05), 0 18px 44px rgba(16,18,24,0.12); border-color: var(--line);
+    background: linear-gradient(to bottom, #eceef1 0 68.4%, #9aa0a8 68.4% 69.7%, #dfe2e6 69.7% 86.8%, #9aa0a8 86.8% 88.2%, #ced2d8 88.2% 100%);
+  }
+  .hero svg.px { position: static; transform: none; left: auto; }
+  .scene { position: relative; width: 960px; max-width: none; left: 50%; transform: translateX(-50%); line-height: 0; }
+
+  /* Intro: instructions as three clear steps */
+  .instructions { display: flex; flex-direction: column; align-items: stretch; gap: 20px; padding: 24px 26px; }
+  .how { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .how li { display: flex; gap: 16px; align-items: center; background: var(--bg); border-radius: 16px; padding: 14px 16px; }
+  .how strong { display: block; font-family: var(--font-head); font-size: 1.15rem; letter-spacing: -0.01em; }
+  .how p { color: var(--muted); line-height: 1.45; margin-top: 2px; }
+  .instructions-foot { display: flex; gap: 20px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+  .instructions-foot p { color: var(--muted); max-width: 56ch; }
+  @media (max-width: 860px) { .how { grid-template-columns: minmax(0, 1fr); } }
+
+  /* ---------- Intro, simplified: small text-free illustration as background; copy leads ---------- */
+  .intro-top {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 448px); column-gap: 40px; row-gap: 16px; align-items: center;
+    grid-template-areas: "head hero" "lead hero";
+  }
+  .intro-head { grid-area: head; align-self: end; }
+  .intro-lead { grid-area: lead; align-self: start; font-size: 1.15rem; line-height: 1.7; max-width: 54ch; }
+  .intro-top .hero { grid-area: hero; }
+  .intro-head h2 { font-size: clamp(1.9rem, 4.5vw, 2.6rem); letter-spacing: -0.02em; }
+  .hero { background: #e6f1ee; border-radius: 16px; box-shadow: none; border: 1px solid var(--line); overflow: hidden; line-height: 0; }
+  .hero svg.px { width: 100%; max-width: 448px; height: auto; position: static; transform: none; left: auto; image-rendering: pixelated; }
+  .scene { position: static; transform: none; left: auto; width: auto; max-width: none; }
+  .callout { max-width: 72ch; }
+  .instructions-lead { max-width: 64ch; color: var(--ink); line-height: 1.65; margin-top: -8px; }
+  @media (max-width: 860px) {
+    .intro-top { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "hero" "lead"; row-gap: 20px; }
+    .intro-head { align-self: start; }
+  }
+
+  /* Intro top: title and background paragraph, single column */
+  .intro-top { display: flex; flex-direction: column; gap: 16px; }
+  .intro-lead { max-width: 60ch; }
+  .intro-head, .intro-lead { align-self: flex-start; }
+</style>
+
+<header class="topbar">
+  <div class="wrap">
+    <h1 class="brand"><span class="mark" aria-hidden="true"></span><span>Student Employee Cybersecurity Onboarding Training</span> <small id="brand-activity" hidden>Consequence Mapping</small></h1>
+    <button type="button" class="btn secondary help-btn" id="help-toggle" aria-expanded="false" aria-controls="help-panel" hidden>Help resources</button>
+  </div>
+</header>
+
+<div class="wrap progress-bar">
+  <nav aria-label="Activity progress">
+    <ol class="progress" id="progress"></ol>
+  </nav>
+</div>
+
+<main class="wrap" id="main">
+
+  <!-- Help panel: available during Worked Example and Practice -->
+  <aside class="help" id="help-panel" aria-labelledby="help-title" hidden>
+    <div class="help-head">
+      <h2 id="help-title" tabindex="-1">Help resources</h2>
+      <button type="button" class="btn secondary help-btn" id="help-close">Close help</button>
+    </div>
+    <div id="help-items"></div>
+  </aside>
+
+  <!-- 1. Introduction -->
+  <section class="stage" id="stage-intro" aria-labelledby="intro-title">
+    <div class="intro-top">
+      <header class="intro-head">
+        <p class="eyebrow">Week 1</p>
+        <h2 id="intro-title" tabindex="-1">Consequences and Contextual Pressure</h2>
+      </header>
+      <p class="intro-lead">A workplace request can feel routine, especially when someone needs something quickly. Before acting, consider what information is involved, where it would go, and who could gain access.</p>
+    </div>
+    <div class="callout">
+      <h3 class="card-title">Learning goal</h3>
+      <p>By the end of this activity, you should be able to identify details that increase concern and explain how following a request could lead to harm.</p>
+    </div>
+    <div class="instructions">
+      <h3 class="card-title">Instructions</h3>
+      <p class="instructions-lead">In this activity, you’ll study how a research assistant analyzes an unusual request. Then you’ll apply the same process to a new scenario.</p>
+      <ol class="how">
+        <li><div class="tile" data-sprite="magnifier" aria-hidden="true"></div><div><strong>Explore</strong><p>A completed consequence map.</p></div></li>
+        <li><div class="tile" data-sprite="spreadsheet" aria-hidden="true"></div><div><strong>Complete</strong><p>Your own map, using dropdown selections.</p></div></li>
+        <li><div class="tile" data-sprite="note" aria-hidden="true"></div><div><strong>Explain</strong><p>Your reasoning, in one sentence.</p></div></li>
+      </ol>
+      <div class="instructions-foot">
+        <p>You can review the example and use the help resources at any time.</p>
+        <button type="button" class="btn" data-go="example">Explore the Example</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Worked Example -->
+  <section class="stage" id="stage-example" aria-labelledby="example-title" hidden>
+    <div>
+      <p class="eyebrow">Worked Example</p>
+      <h2 id="example-title" tabindex="-1">An Urgent Request for Research Data</h2>
+    </div>
+    <div class="scenario">
+      <div class="tile" id="ex-avatar" aria-hidden="true"></div>
+      <div class="txt">
+        <p>You’re a new research assistant. You receive the message below during the workday.</p>
+        <p>The spreadsheet contains participant information and unpublished research results. You haven’t independently verified the request or checked who can access the destination folder.</p>
+      </div>
+    </div>
+    <p class="lead">The research assistant has completed the five-step map below. Read the answers, then open each step to see the reasoning behind it.</p>
+    <div class="workspace">
+      <div class="msg-col">
+        <div class="email" id="ex-msg-box">
+          <div class="email-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="label" id="ex-msg-label">Message received</span></div>
+          <blockquote id="ex-msg" aria-labelledby="ex-msg-label"></blockquote>
+        </div>
+      </div>
+      <ol class="steps" id="ex-steps" aria-label="Completed consequence map"></ol>
+    </div>
+    <div class="together">
+      <span class="label">Putting the reasoning together</span>
+      <p>Uploading the spreadsheet to an unverified folder could let people without permission see participant information and unpublished results. The authority claim, short deadline, and request to bypass IT make it important to pause and verify before sharing.</p>
+    </div>
+    <p class="lead">Now use the same five questions to analyze a new request. Look carefully at the details in the new message and trace how the requested action could affect access to the information.</p>
+    <div class="actions"><button type="button" class="btn" data-go="practice">Try It Yourself</button></div>
+  </section>
+
+  <!-- 3. Practice -->
+  <section class="stage" id="stage-practice" aria-labelledby="practice-title" hidden>
+    <div>
+      <p class="eyebrow">Practice</p>
+      <h2 id="practice-title" tabindex="-1">A Request to Send Student Grades</h2>
+    </div>
+    <div class="scenario">
+      <div class="tile" id="pr-avatar" aria-hidden="true"></div>
+      <div class="txt">
+        <p>You’re a teaching assistant. You receive the message below.</p>
+        <p>The spreadsheet contains student names and individual grades. You haven’t independently confirmed the request with Professor Rivera or verified the personal email account.</p>
+      </div>
+    </div>
+    <p class="lead">Complete the five steps below. Choose one answer for each step and read the feedback. You can change your answers as you work.</p>
+    <div class="workspace">
+      <div class="msg-col">
+        <div class="email">
+          <div class="email-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="label" id="pr-msg-label">Message received</span></div>
+          <blockquote id="pr-msg" aria-labelledby="pr-msg-label">“Professor Rivera needs the grade spreadsheet for a meeting in ten minutes. Please send it as an attachment to this personal email address now so I can open it during the meeting.”</blockquote>
+        </div>
+      </div>
+      <ol class="steps" id="pr-steps" aria-label="Your consequence map"></ol>
+    </div>
+    <div class="status" id="pr-status" role="status" aria-live="polite"></div>
+    <div class="actions">
+      <button type="button" class="btn secondary" data-go="example">Review the Example</button>
+      <button type="button" class="btn secondary" id="review-map">Review My Map</button>
+      <button type="button" class="btn" id="to-reflection" data-go="reflection" hidden>Explain My Reasoning</button>
+    </div>
+  </section>
+
+  <!-- 4. Reflection -->
+  <section class="stage" id="stage-reflection" aria-labelledby="reflection-title" hidden>
+    <div>
+      <p class="eyebrow">Reflection</p>
+      <h2 id="reflection-title" tabindex="-1">Explain the Connection</h2>
+    </div>
+    <div class="prompt-row">
+      <div class="tile" id="rf-avatar" aria-hidden="true"></div>
+      <div class="prose">
+        <p><strong>In one sentence, explain how following the request could affect student privacy.</strong></p>
+        <p>Include what would happen to the file and how that could let someone without permission see the information.</p>
+      </div>
+    </div>
+    <div class="field">
+      <label for="explain">Your explanation</label>
+      <textarea id="explain" rows="4" aria-describedby="explain-error"></textarea>
+      <div class="error" id="explain-error" role="alert"></div>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn secondary" data-go="practice">Revise My Map</button>
+      <button type="button" class="btn" id="compare">Compare with an Example Answer</button>
+    </div>
+    <div id="reveal" hidden style="display:flex;flex-direction:column;gap:16px">
+      <div class="example-answer">
+        <h3 id="example-answer-title" tabindex="-1">Example answer</h3>
+        <p>Sending the attachment would place a copy in an unverified personal inbox, where someone without permission could open it and see students’ names and grades.</p>
+      </div>
+      <div class="prose" role="group" aria-labelledby="selfcheck-intro">
+        <p id="selfcheck-intro">Compare your explanation with these two questions. Your wording can be different from the example.</p>
+        <ul class="checks">
+          <li><label><input type="checkbox" id="check-1"><span>Did I explain that a copy would go to an unverified account?</span></label></li>
+          <li><label><input type="checkbox" id="check-2"><span>Did I explain how someone without permission could see the students’ names and grades?</span></label></li>
+        </ul>
+        <p>If either part is missing, revise your explanation to make the connection clearer.</p>
+      </div>
+      <div class="actions"><button type="button" class="btn" data-go="complete">Finish Activity</button></div>
+    </div>
+  </section>
+
+  <!-- 5. Completion -->
+  <section class="stage" id="stage-complete" aria-labelledby="complete-title" hidden>
+    <h2 id="complete-title" tabindex="-1">Activity Complete</h2>
+    <div class="done-row">
+      <div class="done-art" id="done-art" aria-hidden="true"></div>
+      <div class="prose" style="flex:1 1 300px">
+        <p>You have traced how an unverified request could lead to information exposure.</p>
+        <p>In the Week 1 Scenario Analysis, use the same five questions to identify relevant cues and explain how an action could lead to a specific consequence.</p>
+      </div>
+    </div>
+    <div class="five-q-box">
+      <ol class="five-q">
+        <li>What information is at risk?</li>
+        <li>Which details should make me pause?</li>
+        <li>What would I do if I followed the request?</li>
+        <li>What could happen as a result?</li>
+        <li>What should I do next?</li>
+      </ol>
+    </div>
+    <div class="actions"><button type="button" class="btn" data-go="practice">Review My Work</button></div>
+  </section>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  var STAGES = [
+    { id: "intro", name: "Introduction" },
+    { id: "example", name: "Worked Example" },
+    { id: "practice", name: "Practice" },
+    { id: "reflection", name: "Reflection" },
+    { id: "complete", name: "Completion" }
+  ];
+
+  /* ---------- Pixel art (one grid: PX css pixels per cell, for every sprite and scene) ---------- */
+  var PX = 4;
+  var NS = "http://www.w3.org/2000/svg";
+  var PAL = {
+    k: "#2a2c30", r: "#c41230", R: "#8c0d24", w: "#ffffff", g: "#dfe2e6", G: "#9aa0a8", d: "#55595f",
+    s: "#f1c9a5", h: "#3b2f2a", b: "#cfe3f4", n: "#3f8f5f", f: "#ced2d8", e: "#eceef1", S: "#bcc1c9", z: "#d9a982", i: "#e6f1ee", m: "#cfe6e0", L: "#b4d3cd", q: "#f08a93", Q: "#e0606c", v: "#2e9e68"
+  };
+  var SPR = {
+    student: [
+      "...kkkkkk...", "..khhhhhhk..", ".khhhhhhhhk.", ".khhssssshk.", ".kssksskssk.", ".kssssssssk.",
+      "..kssssssk..", "...kkkkkk...", ".kkrrrrrrkk.", "krrrrrrrrrrk", "krrrrwwrrrrk", "krrrrwwrrrrk", "kkkkkkkkkkkk"
+    ],
+    laptopBack: [
+      "..kkkkkkkkkkkk..", "..kddddddddddk..", "..kddddddddddk..", "..kdddddrrdddk..",
+      "..kddddddddddk..", "..kkkkkkkkkkkk..", ".kggggggggggggk.", "kkkkkkkkkkkkkkkk"
+    ],
+    spreadsheet: [
+      "kkkkkkkkkkkk", "krrrrrrrrrrk", "kwwwGwwwGwwk", "kgggGgggGggk", "kwwwGwwwGwwk", "kgggGgggGggk",
+      "kwwwGwwwGwwk", "kgggGgggGggk", "kwwwGwwwGwwk", "kgggGgggGggk", "kwwwGwwwGwwk", "kkkkkkkkkkkk"
+    ],
+    envelope: [
+      "kkkkkkkkkkkkkk", "kwwwwwwwwwwwwk", "kwrwwwwwwwwrwk", "kwwrwwwwwwrwwk", "kwwwrwwwwrwwwk",
+      "kwwwwrwwrwwwwk", "kwwwwwrrwwwwwk", "kwwwwwwwwwwwwk", "kkkkkkkkkkkkkk"
+    ],
+    folder: [
+      ".kkkkk........", "krrrrrkkkkkkkk", "kggggggggggggk", "kggggggggggggk", "kggggggggggggk",
+      "kggggggggggggk", "kggggggggggggk", "kggggggggggggk", "kkkkkkkkkkkkkk"
+    ],
+    magnifier: [
+      "..kkkk......", ".kbbbbk.....", "kbwbbbbk....", "kbwbbbbk....", "kbbbbbbk....", ".kbbbbk.....",
+      "..kkkkkk....", ".......kdk..", "........kdk.", ".........kdk", "..........kk"
+    ],
+    warning: [
+      ".....kk.....", "....krrk....", "...krwwrk...", "...krwwrk...", "..krrwwrrk..", "..krrrrrrk..",
+      "..krrwwrrk..", ".krrrrrrrrk.", ".kkkkkkkkkk."
+    ],
+    shield: [
+      "kkkkkkkkkk", "krrrrrrrrk", "krrrrrrwrk", "krrrrrwwrk", "krwrrwwrrk", "krwwwwrrrk",
+      "krrwwrrrrk", ".krrrrrrk.", "..krrrrk..", "...kkkk..."
+    ],
+    check: [
+      "...kkkkkkkk...", ".kkvvvvvvvvkk.", ".kvvvvvvvvvvk.", "kvvvvvvvvvvvvk", "kvvvvvvvvvvwwk", "kvvvvvvvvvwwvk", "kvvvvvvvvwwvvk",
+      "kvvwwvvvwwvvvk", "kvvvwwvwwvvvvk", "kvvvvwwwvvvvvk", "kvvvvvvvvvvvvk", ".kvvvvvvvvvvk.", ".kkvvvvvvvvkk.", "...kkkkkkkk..."
+    ],
+    file: ["kkkkk", "kwwwk", "kwrwk", "kwwwk", "kwrwk", "kkkkk"],
+    note: [
+      "kkkkkkkk..", "kwwwwwwkk.", "kwwwwwwkwk", "kwwwwwwkkk", "kwwwwwwwwk", "kwGGGGGwwk",
+      "kwwwwwwwwk", "kwGGGGGGwk", "kwwwwwwwwk", "kwGGGwwwwk", "kwwwwwwwwk", "kkkkkkkkkk"
+    ],
+    plant: [".nn.n.", "nnnnnn", ".nnnn.", "..nn..", ".kkkk.", ".krrk.", ".krrk.", ".kkkk."]
+  };
+  var TA_PAL = { h: "#7a5233", r: "#55595f" };
+
+  function paint(parent, rows, pal) {
+    var w = rows[0].length;
+    rows.forEach(function (row, y) {
+      var x = 0;
+      while (x < w) {
+        var c = row.charAt(x);
+        if (c === ".") { x++; continue; }
+        var x2 = x;
+        while (x2 < w && row.charAt(x2) === c) x2++;
+        var r = document.createElementNS(NS, "rect");
+        r.setAttribute("x", x); r.setAttribute("y", y); r.setAttribute("width", x2 - x); r.setAttribute("height", 1);
+        r.setAttribute("fill", (pal && pal[c]) || PAL[c]);
+        parent.appendChild(r);
+        x = x2;
+      }
+    });
+  }
+
+  function newSvg(w, h, px) {
+    px = px || PX;
+    var svg = document.createElementNS(NS, "svg");
+    svg.setAttribute("viewBox", "0 0 " + w + " " + h);
+    svg.setAttribute("width", w * px);
+    svg.setAttribute("height", h * px);
+    svg.setAttribute("shape-rendering", "crispEdges");
+    svg.setAttribute("class", "px");
+    svg.setAttribute("aria-hidden", "true");
+    svg.setAttribute("focusable", "false");
+    return svg;
+  }
+
+  function render(rows, pal) {
+    var svg = newSvg(rows[0].length, rows.length);
+    paint(svg, rows, pal);
+    return svg;
+  }
+
+  function put(id, node) { var h = $(id); if (h) h.appendChild(node); }
+
+  /* ---------- Data ---------- */
+  var EXAMPLE_MESSAGE = [
+    "“", { kind: "cue", tag: "A", t: "Professor Chen needs" }, " the ", { kind: "info", tag: "INFO", t: "participant spreadsheet" },
+    " for an external collaborator’s presentation ", { kind: "cue", tag: "B", t: "in ten minutes" }, ". ",
+    { kind: "action", tag: "ACTION", parts: ["Upload it to ", { kind: "cue", tag: "D", t: "this personal Dropbox folder" }] },
+    " ", { kind: "cue", tag: "B", t: "now" }, ". ", { kind: "cue", tag: "C", t: "Please do not involve IT" }, " because there is no time.”"
+  ];
+
+  var EXAMPLE = [
+    {
+      icon: "spreadsheet", reveal: "show-info",
+      q: "What information is at risk?",
+      a: "Participant information and unpublished research results",
+      quote: "“The spreadsheet contains information about research participants and results our team hasn’t published yet. Before sharing it, I need to know who is authorized to see that information.”",
+      annotations: [
+        { tag: "INFO", src: "“participant spreadsheet”", text: "Information at risk — the file holds participant details and unpublished results" }
+      ],
+      support: "Start with what the file contains. Its contents help you understand who could be affected if it is shared inappropriately."
+    },
+    {
+      icon: "magnifier", reveal: "show-cues",
+      q: "Which details should make me pause?",
+      a: "Claimed authority, urgency, pressure to bypass IT, and an unverified destination",
+      quote: "“‘Professor Chen needs’ makes the request sound official. ‘In ten minutes’ pushes me to act quickly. The message also asks me to bypass IT and upload the file to a personal folder whose access I haven’t checked. Together, these details give me reasons to pause and verify.”",
+      annotations: [
+        { tag: "A", cue: true, src: "“Professor Chen needs”", text: "Claimed authority — invokes the professor’s position to encourage action" },
+        { tag: "B", cue: true, src: "“in ten minutes” / “now”", text: "Urgency — creates pressure to act before checking" },
+        { tag: "C", cue: true, src: "“Please do not involve IT”", text: "Pressure to bypass a safeguard — discourages seeking guidance" },
+        { tag: "D", cue: true, src: "“this personal Dropbox folder”", text: "Unverified destination — access and approval haven’t been checked" }
+      ]
+    },
+    {
+      icon: "folder", reveal: "show-action",
+      q: "What would I do if I followed the request?",
+      a: "Upload a copy of the spreadsheet to a personal folder I haven’t verified",
+      quote: "“If I upload the spreadsheet, I’ll put a copy in that folder. I haven’t confirmed who owns the folder, who can open it, or whether it is approved for this information.”",
+      annotations: [
+        { tag: "ACTION", src: "“Upload it to this personal Dropbox folder”", text: "Requested action — creates another copy in a location with unverified access" }
+      ],
+      support: "Identify the specific action. Here, uploading creates another copy of the file in a location with unverified access."
+    },
+    {
+      icon: "warning",
+      q: "What could happen as a result?",
+      a: "People without permission could see participant information or unpublished results",
+      quote: "“If someone without permission can open the folder, they could view or download the spreadsheet. That could compromise participant privacy or reveal research findings before the team is ready to share them.”",
+      support: "The possible consequence follows from the action. Uploading the copy could give unintended viewers access to the information.",
+      connector: "could lead to"
+    },
+    {
+      icon: "shield",
+      q: "What should I do next?",
+      a: "Pause, verify through a known channel, and seek guidance if needed",
+      quote: "“I’ll hold off on uploading and contact Professor Chen using university contact information I already have. If the request is legitimate, I’ll confirm who needs access and how the file should be shared. If I can’t verify the request or I’m unsure what to do, I’ll seek guidance using the course decision aid.”",
+      support: "Verification checks whether the request is genuine. Confirming the sharing method checks how to provide access appropriately."
+    }
+  ];
+
+  var PLACEHOLDER = "Select an answer";
+  var PRACTICE_ICONS = ["spreadsheet", "magnifier", "envelope", "warning", "shield"];
+  var PRACTICE = [
+    {
+      q: "What information would you be sharing?",
+      correct: 1,
+      options: [
+        { t: "A. Student names and email addresses", f: "Review the scenario. It tells you what information appears alongside the students’ names." },
+        { t: "B. Student names and individual grades", f: "Correct. Each grade is connected to a specific student, so sharing the file could expose individual academic information." },
+        { t: "C. Class averages and assignment titles", f: "Review the scenario. The spreadsheet contains information about individual students." }
+      ]
+    },
+    {
+      q: "Which set of details gives you reasons to pause and verify?",
+      correct: 2,
+      options: [
+        { t: "A. The professor’s name, the short deadline, and a request to keep the message secret", f: "The professor’s name and deadline are present. Look again for the third detail. Where does the message ask you to send the file?" },
+        { t: "B. The short deadline, the meeting, and the spreadsheet format", f: "The deadline creates urgency. Look for whose authority the message invokes and which account would receive the information." },
+        { t: "C. The professor’s name, the short deadline, and the request to use a personal email address", f: "Correct. The message invokes the professor’s authority, creates urgency, and requests delivery to a personal account you haven’t verified. These details call for checking before acting." }
+      ]
+    },
+    {
+      q: "What would you do if you followed the request?",
+      correct: 0,
+      options: [
+        { t: "A. Send a copy of the spreadsheet to an email account you haven’t verified", f: "Correct. Sending an attachment places a copy of the spreadsheet in the recipient’s inbox." },
+        { t: "B. Give the recipient a link to the spreadsheet in its current location", f: "Read the requested action again. The sender asks for the spreadsheet as an attachment." },
+        { t: "C. Change the original spreadsheet’s access permissions", f: "Changing permissions affects who can open the original file. Consider what sending an attachment would create in the recipient’s inbox." }
+      ]
+    },
+    {
+      q: "Which consequence could result directly from sending the attachment?",
+      correct: 1,
+      connector: "could lead to",
+      options: [
+        { t: "A. The recipient could change the official grades in the university’s grading system", f: "Receiving a spreadsheet gives the recipient access to the information in that copy. Think about what they could see when they open it." },
+        { t: "B. Someone without permission could see the students’ names and grades", f: "Correct. Someone with access to the unverified inbox could open the attachment and see grades linked to individual students." },
+        { t: "C. Current users could lose access to the original spreadsheet", f: "Sending a copy leaves the original file’s access permissions in place. Consider the information available in the new copy." }
+      ]
+    },
+    {
+      q: "What is the most appropriate next step?",
+      correct: 2,
+      options: [
+        { t: "A. Reply to the same message and send the file if the sender confirms the address", f: "A reply goes back to the same sender. Use a known university contact method to confirm the request independently." },
+        { t: "B. Send the file and copy the professor’s university address so they can review the request", f: "The attachment would already be in the personal inbox by the time the professor reviewed it. Verify before sharing the information." },
+        { t: "C. Hold off, contact the professor through a known university channel, and confirm the approved way to share the file", f: "Correct. This lets you verify the request before sharing. If it is legitimate, confirm who needs access and which sharing method is approved. Seek guidance if uncertainty remains." }
+      ]
+    }
+  ];
+
+  var STATUS = {
+    incomplete: "Complete the remaining steps to review your map.",
+    revise: "Review the feedback on the marked steps. You can revise your answers before continuing.",
+    done: "Your map connects the requested action to a possible privacy consequence. Now explain that connection in your own words."
+  };
+
+  var HELP = [
+    {
+      title: "Contextual Cues",
+      items: [
+        ["Claimed authority", "A request invokes someone’s position or name to encourage you to act."],
+        ["Urgency", "A short deadline creates pressure to act before checking."],
+        ["Pressure to bypass a safeguard", "A request asks you to skip a usual check, avoid seeking help, or keep the action from others."],
+        ["Unverified destination", "You haven’t confirmed who controls the account or folder, who can access it, or whether it is appropriate for the information."]
+      ],
+      note: "Use these cues as reasons to pause and check the request."
+    },
+    {
+      title: "Possible Consequences",
+      items: [
+        ["Information exposure", "Someone without permission could view or download a file."],
+        ["Harm to individuals", "Exposure could reveal private details connected to specific people, such as participants’ information or students’ grades."],
+        ["Harm to a project", "Sharing unpublished results could reveal findings before the research team is ready."]
+      ],
+      note: "Connect the consequence to the information and action in the scenario."
+    },
+    {
+      title: "Pause, Verify, and Report",
+      items: [
+        ["Pause", "Hold off on sending, uploading, or changing access while you check the request."],
+        ["Verify", "Contact the person through a channel you already trust. Confirm the request, intended recipients, and approved sharing method."],
+        ["Seek guidance or report", "If the request remains suspicious or you’re unsure what to do, follow your organization’s guidance and reporting process."]
+      ]
+    }
+  ];
+
+  /* ---------- Helpers ---------- */
+  function $(sel, root) { return (root || document).querySelector(sel); }
+  function el(tag, attrs, children) {
+    var n = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (k) {
+      if (k === "text") n.textContent = attrs[k];
+      else if (k === "class") n.className = attrs[k];
+      else n.setAttribute(k, attrs[k]);
+    });
+    (children || []).forEach(function (c) { if (c) n.appendChild(c); });
+    return n;
+  }
+  function tile(name) { var t = el("div", { class: "tile", "aria-hidden": "true" }); t.appendChild(render(SPR[name])); return t; }
+
+  var state = {
+    stage: "intro",
+    reached: 0,
+    answers: [null, null, null, null, null],
+    flagged: [false, false, false, false, false],
+    revealed: false,
+    helpOpen: false
+  };
+
+  /* ---------- Progress ---------- */
+  function renderProgress() {
+    var ol = $("#progress");
+    ol.textContent = "";
+    var cur = STAGES.findIndex(function (s) { return s.id === state.stage; });
+    STAGES.forEach(function (s, i) {
+      var li = el("li", { text: s.name });
+      if (i === cur) li.setAttribute("aria-current", "step");
+      else if (i < cur || i < state.reached) li.className = "done";
+      if (i !== cur && (i < cur || i < state.reached)) li.appendChild(el("span", { class: "vh", text: " (visited)" }));
+      ol.appendChild(li);
+    });
+  }
+
+  /* ---------- Navigation ---------- */
+  var HELP_STAGES = { example: true, practice: true };
+
+  function go(id, opts) {
+    opts = opts || {};
+    state.stage = id;
+    var idx = STAGES.findIndex(function (s) { return s.id === id; });
+    if (idx > state.reached) state.reached = idx;
+    STAGES.forEach(function (s) { $("#stage-" + s.id).hidden = s.id !== id; });
+    var hasHelp = !!HELP_STAGES[id];
+    $("#help-toggle").hidden = !hasHelp;
+    $("#brand-activity").hidden = id === "intro"; // activity name appears from the Worked Example onward
+    if (!hasHelp) setHelp(false, true);
+    renderProgress();
+    window.scrollTo(0, 0);
+    var h = $("#stage-" + id + " h2");
+    if (h && !opts.noFocus) h.focus({ preventScroll: true });
+  }
+
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-go]");
+    if (b) go(b.getAttribute("data-go"));
+  });
+
+  /* ---------- Help ---------- */
+  function buildHelp() {
+    var host = $("#help-items");
+    HELP.forEach(function (r, i) {
+      var bid = "help-btn-" + i, pid = "help-body-" + i;
+      var btn = el("button", { type: "button", class: "help-toggle", id: bid, "aria-expanded": "false", "aria-controls": pid }, [
+        el("span", { text: r.title }), el("span", { "aria-hidden": "true", text: "+" })
+      ]);
+      var dl = el("dl");
+      r.items.forEach(function (it) { dl.appendChild(el("dt", { text: it[0] })); dl.appendChild(el("dd", { text: it[1] })); });
+      var body = el("div", { class: "help-body", id: pid, role: "region", "aria-labelledby": bid, hidden: "" }, [dl]);
+      if (r.note) body.appendChild(el("p", { class: "help-note", text: r.note }));
+      btn.addEventListener("click", function () {
+        var open = btn.getAttribute("aria-expanded") === "true";
+        btn.setAttribute("aria-expanded", String(!open));
+        btn.lastChild.textContent = open ? "+" : "−";
+        body.hidden = open;
+      });
+      host.appendChild(el("div", { class: "help-item" }, [btn, body]));
+    });
+  }
+
+  function setHelp(open, silent) {
+    state.helpOpen = open;
+    $("#help-panel").hidden = !open;
+    var t = $("#help-toggle");
+    t.setAttribute("aria-expanded", String(open));
+    t.textContent = open ? "Hide help resources" : "Help resources";
+    if (!silent) {
+      if (open) $("#help-title").focus();
+      else t.focus();
+    }
+  }
+  $("#help-toggle").addEventListener("click", function () { setHelp(!state.helpOpen); });
+  $("#help-close").addEventListener("click", function () { setHelp(false); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && state.helpOpen && $("#help-panel").contains(document.activeElement)) setHelp(false);
+  });
+
+  /* ---------- Worked example ---------- */
+  function renderParts(parent, parts) {
+    parts.forEach(function (p) {
+      if (typeof p === "string") { parent.appendChild(document.createTextNode(p)); return; }
+      var m = el("mark", { class: p.kind });
+      if (p.parts) renderParts(m, p.parts); else m.appendChild(document.createTextNode(p.t));
+      m.appendChild(el("sup", { class: "tag-px tag-" + p.kind, "aria-hidden": "true", text: p.tag }));
+      parent.appendChild(m);
+    });
+  }
+
+  function buildExample() {
+    renderParts($("#ex-msg"), EXAMPLE_MESSAGE);
+
+    var ol = $("#ex-steps");
+    EXAMPLE.forEach(function (s, i) {
+      var n = i + 1, bid = "ex-btn-" + n, pid = "ex-panel-" + n;
+      var li = el("li");
+      if (s.connector) li.appendChild(el("div", { class: "connector", text: s.connector }));
+      var card = el("div", { class: "step-card" });
+      card.appendChild(tile(s.icon));
+      var body = el("div", { class: "step-body" });
+      body.appendChild(el("div", { class: "step-top" }, [
+        el("span", { class: "step-num", text: "Step " + n }),
+        el("h3", { class: "step-q", text: s.q })
+      ]));
+      body.appendChild(el("p", { class: "answer-line" }, [
+        el("span", { class: "label", text: "Completed answer" }),
+        el("span", { class: "a", text: s.a })
+      ]));
+      var label = el("span", { text: "See the reasoning" });
+      var btn = el("button", { type: "button", class: "toggle", id: bid, "aria-expanded": "false", "aria-controls": pid }, [
+        el("span", { class: "chev", "aria-hidden": "true", text: "▸" }), label,
+        el("span", { class: "vh", text: " for step " + n })
+      ]);
+      var panel = el("div", { class: "reason", id: pid, role: "region", "aria-labelledby": bid, hidden: "" });
+      panel.appendChild(el("p", { class: "quote", text: s.quote }));
+      if (s.annotations) {
+        var ul = el("ul", { class: "annotations", "aria-label": "Highlighted details in the message" });
+        s.annotations.forEach(function (a, k) {
+          var li2 = el("li", { style: "--i:" + k }, [
+            el("span", { class: "tag" + (a.cue ? " t-cue" : ""), text: a.tag }),
+            el("span", {}, [el("span", { class: "src", text: a.src }), document.createTextNode(" → " + a.text)])
+          ]);
+          ul.appendChild(li2);
+        });
+        panel.appendChild(ul);
+      }
+      if (s.support) panel.appendChild(el("p", { class: "support", text: s.support }));
+      btn.addEventListener("click", function () {
+        var open = btn.getAttribute("aria-expanded") === "true";
+        btn.setAttribute("aria-expanded", String(!open));
+        label.textContent = open ? "See the reasoning" : "Hide the reasoning";
+        panel.hidden = open;
+        if (s.reveal) $("#ex-msg-box").classList.toggle(s.reveal, !open);
+      });
+      body.appendChild(btn);
+      body.appendChild(panel);
+      card.appendChild(body);
+      li.appendChild(card);
+      ol.appendChild(li);
+    });
+  }
+
+  /* ---------- Practice ---------- */
+  var selects = [], feedbacks = [], cards = [], flags = [];
+
+  function buildPractice() {
+    var ol = $("#pr-steps");
+    PRACTICE.forEach(function (q, i) {
+      var n = i + 1, sid = "pr-select-" + n, fid = "pr-feedback-" + n;
+      var li = el("li");
+      if (q.connector) li.appendChild(el("div", { class: "connector", text: q.connector }));
+      var card = el("div", { class: "step-card" });
+      card.appendChild(tile(PRACTICE_ICONS[i]));
+      var body = el("div", { class: "step-body" });
+      var flag = el("span", { class: "flag", text: "Review this step", hidden: "" });
+      body.appendChild(el("div", { class: "step-top" }, [el("span", { class: "step-num", text: "Step " + n }), flag]));
+      body.appendChild(el("label", { class: "step-q", for: sid, text: q.q }));
+      var sel = el("select", { id: sid, "aria-describedby": fid });
+      sel.appendChild(el("option", { value: "", disabled: "", selected: "", text: PLACEHOLDER }));
+      q.options.forEach(function (o, j) { sel.appendChild(el("option", { value: String(j), text: o.t })); });
+      var fb = el("div", { class: "feedback", id: fid, role: "status", "aria-live": "polite" });
+      sel.addEventListener("change", function () { choose(i, parseInt(sel.value, 10)); });
+      body.appendChild(sel);
+      body.appendChild(fb);
+      card.appendChild(body);
+      li.appendChild(card);
+      ol.appendChild(li);
+      selects.push(sel); feedbacks.push(fb); cards.push(card); flags.push(flag);
+    });
+  }
+
+  function isCorrect(i) { return state.answers[i] === PRACTICE[i].correct; }
+  function allAnswered() { return state.answers.every(function (a) { return a !== null; }); }
+  function allCorrect() { return PRACTICE.every(function (_, i) { return isCorrect(i); }); }
+
+  function renderFeedback(i) {
+    var fb = feedbacks[i], a = state.answers[i];
+    fb.textContent = "";
+    fb.className = "feedback";
+    if (a === null) return;
+    var good = isCorrect(i);
+    fb.className = "feedback " + (good ? "good" : "review");
+    fb.appendChild(el("span", { class: "chip", "aria-hidden": "true", text: good ? "✓ Correct" : "Not yet" }));
+    fb.appendChild(el("span", { text: PRACTICE[i].options[a].f }));
+  }
+
+  function setFlag(i, on) {
+    state.flagged[i] = on;
+    flags[i].hidden = !on;
+    cards[i].classList.toggle("needs-review", on);
+  }
+
+  function choose(i, j) {
+    state.answers[i] = j;
+    renderFeedback(i);
+    setFlag(i, false);
+    $("#pr-status").textContent = "";
+    $("#to-reflection").hidden = !allCorrect();
+  }
+
+  $("#review-map").addEventListener("click", function () {
+    var st = $("#pr-status");
+    if (!allAnswered()) {
+      PRACTICE.forEach(function (_, i) { setFlag(i, false); });
+      st.textContent = STATUS.incomplete;
+      return;
+    }
+    PRACTICE.forEach(function (_, i) { setFlag(i, !isCorrect(i)); });
+    st.textContent = allCorrect() ? STATUS.done : STATUS.revise;
+    $("#to-reflection").hidden = !allCorrect();
+    if (!allCorrect()) {
+      var first = PRACTICE.findIndex(function (_, i) { return !isCorrect(i); });
+      selects[first].focus();
+    }
+  });
+
+  /* ---------- Reflection ---------- */
+  var explain = $("#explain"), errBox = $("#explain-error");
+  explain.addEventListener("input", function () {
+    if (errBox.textContent) { errBox.textContent = ""; explain.removeAttribute("aria-invalid"); }
+  });
+  $("#compare").addEventListener("click", function () {
+    if (!explain.value.trim()) {
+      errBox.textContent = "";
+      window.setTimeout(function () { errBox.textContent = "Write your explanation before viewing the example answer."; }, 30);
+      explain.setAttribute("aria-invalid", "true");
+      explain.focus();
+      return;
+    }
+    errBox.textContent = "";
+    explain.removeAttribute("aria-invalid");
+    var first = !state.revealed;
+    state.revealed = true;
+    $("#reveal").hidden = false;
+    if (first) $("#example-answer-title").focus();
+  });
+
+  /* ---------- Init ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll("[data-sprite]"), function (n) { n.appendChild(render(SPR[n.getAttribute("data-sprite")])); });
+  (function () {
+    var t = $("#ex-avatar"); t.appendChild(render(SPR.student));
+    var p = $("#pr-avatar"); p.appendChild(render(SPR.student, TA_PAL));
+    var r = $("#rf-avatar"); r.appendChild(render(SPR.student, TA_PAL));
+    var d = $("#done-art"); d.appendChild(el("div", { class: "tile" }, [render(SPR.student, TA_PAL)])); d.appendChild(el("div", { class: "tile" }, [render(SPR.shield)]));
+  })();
+  buildHelp();
+  buildExample();
+  buildPractice();
+  setHelp(false, true);
+  go("intro", { noFocus: true });
+})();
+</script>
+
+</html>
