@@ -444,6 +444,62 @@
   .help-links a { color: var(--accent); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
   .help-links a:hover { text-decoration-thickness: 2px; }
   .help-links .url { font-size: 0.85rem; color: var(--muted); overflow-wrap: anywhere; }
+
+  /* ---------- Hierarchy pass ---------- */
+  /* Progress: a stepper (status, not buttons) */
+  .progress-bar { padding-block: 20px 4px; }
+  .progress-bar .progress { gap: 0; flex-wrap: nowrap; }
+  .progress-bar .progress li {
+    border: 0; background: none; padding: 0; border-radius: 0; color: var(--muted);
+    display: flex; align-items: center; gap: 8px; font-size: 0.92rem; font-weight: 600; white-space: nowrap;
+  }
+  .progress-bar .progress li::before { content: none !important; }
+  .progress-bar .progress li:not(:last-child)::after { content: ""; display: block; width: 28px; height: 2px; margin: 0 12px; background: var(--line); }
+  .progress-bar .progress li.done { color: var(--ink); }
+  .progress-bar .progress li.done:not(:last-child)::after { background: var(--good); }
+  .progress-bar .progress li[aria-current="step"] { color: var(--ink); background: none; font-weight: 700; }
+  .progress .dot { display: grid; place-items: center; flex: none; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--line); background: var(--surface); font-size: 0.8rem; line-height: 1; }
+  .progress li.done .dot { background: var(--good); border-color: var(--good); color: var(--bg); }
+  .progress li[aria-current="step"] .dot { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+  @media (max-width: 700px) {
+    .progress-bar .progress li:not([aria-current="step"]) .name { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+    .progress-bar .progress li:not(:last-child)::after { width: 16px; margin: 0 8px; }
+  }
+
+  /* Title bar: name and Help share one row; activity tag sits under the name on phones */
+  .topbar .wrap { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 16px; align-items: center; }
+  .brand { flex-wrap: wrap; row-gap: 4px; line-height: 1.25; }
+  .brand small { white-space: nowrap; }
+  .help-btn { min-height: 44px; }
+  @media (max-width: 640px) {
+    .brand { font-size: 1rem; }
+    .brand .mark { display: none; }
+    .brand small { flex-basis: 100%; border: 0; padding: 0; margin-left: 0; color: #c9ced4; }
+    .help-btn { padding: 6px 12px; font-size: 0.92rem; }
+  }
+
+  /* One edge: cards span the content width, text keeps a readable measure inside */
+  .scenario { max-width: none; }
+  .scenario .txt { max-width: 76ch; }
+  .callout { max-width: none; }
+  .callout p { max-width: 72ch; }
+  #stage-reflection, #stage-complete { max-width: 760px; }
+  .five-q-box { flex: 0 0 auto; width: 100%; max-width: 460px; }
+
+  /* Worked example: the question leads, the completed answer sits in its own tinted panel */
+  .answer-line { background: var(--bg); border-radius: 12px; padding: 10px 14px; gap: 2px; }
+  .answer-line .a { font-weight: 500; }
+  .step-q { font-weight: 700; }
+
+  /* Practice: show what was chosen, since a closed dropdown clips long text */
+  .fb-text { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .fb-chosen { font-size: 0.9rem; font-weight: 600; color: var(--muted); overflow-wrap: anywhere; }
+
+  /* Touch targets */
+  .toggle, .help-toggle { min-height: 44px; }
+
+  /* Phones: decorative step icons give way to content */
+  @media (max-width: 520px) { .step-card > .tile { display: none; } }
 </style>
 
 <header class="topbar">
@@ -564,7 +620,7 @@
     <div class="status" id="pr-status" role="status" aria-live="polite"></div>
     <div class="actions">
       <button type="button" class="btn secondary" data-go="example">Review the Example</button>
-      <button type="button" class="btn secondary" id="review-map">Review My Map</button>
+      <button type="button" class="btn" id="review-map">Review My Map</button>
       <button type="button" class="btn" id="to-reflection" data-go="reflection" hidden>Explain My Reasoning</button>
     </div>
   </section>
@@ -909,10 +965,12 @@
     ol.textContent = "";
     var cur = STAGES.findIndex(function (s) { return s.id === state.stage; });
     STAGES.forEach(function (s, i) {
-      var li = el("li", { text: s.name });
+      var visited = i !== cur && (i < cur || i < state.reached);
+      var li = el("li", { class: visited ? "done" : "" });
+      li.appendChild(el("span", { class: "dot", "aria-hidden": "true", text: visited ? "✓" : String(i + 1) }));
+      li.appendChild(el("span", { class: "name", text: s.name }));
+      if (visited) li.appendChild(el("span", { class: "vh", text: " (visited)" }));
       if (i === cur) li.setAttribute("aria-current", "step");
-      else if (i < cur || i < state.reached) li.className = "done";
-      if (i !== cur && (i < cur || i < state.reached)) li.appendChild(el("span", { class: "vh", text: " (visited)" }));
       ol.appendChild(li);
     });
   }
@@ -1075,6 +1133,7 @@
 
   function isCorrect(i) { return state.answers[i] === PRACTICE[i].correct; }
   function allAnswered() { return state.answers.every(function (a) { return a !== null; }); }
+  function syncPrimary() { $("#review-map").className = allCorrect() ? "btn secondary" : "btn"; }
   function allCorrect() { return PRACTICE.every(function (_, i) { return isCorrect(i); }); }
 
   function renderFeedback(i) {
@@ -1085,7 +1144,10 @@
     var good = isCorrect(i);
     fb.className = "feedback " + (good ? "good" : "review");
     fb.appendChild(el("span", { class: "chip", "aria-hidden": "true", text: good ? "✓ Correct" : "Not yet" }));
-    fb.appendChild(el("span", { text: PRACTICE[i].options[a].f }));
+    fb.appendChild(el("span", { class: "fb-text" }, [
+      el("span", { class: "fb-chosen", text: "Your answer: " + PRACTICE[i].options[a].t }),
+      el("span", { text: PRACTICE[i].options[a].f })
+    ]));
   }
 
   function setFlag(i, on) {
@@ -1100,6 +1162,7 @@
     setFlag(i, false);
     $("#pr-status").textContent = "";
     $("#to-reflection").hidden = !allCorrect();
+    syncPrimary();
   }
 
   $("#review-map").addEventListener("click", function () {
@@ -1112,6 +1175,7 @@
     PRACTICE.forEach(function (_, i) { setFlag(i, !isCorrect(i)); });
     st.textContent = allCorrect() ? STATUS.done : STATUS.revise;
     $("#to-reflection").hidden = !allCorrect();
+    syncPrimary();
     if (!allCorrect()) {
       var first = PRACTICE.findIndex(function (_, i) { return !isCorrect(i); });
       selects[first].focus();
