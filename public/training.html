@@ -434,6 +434,16 @@
   .intro-top { display: flex; flex-direction: column; gap: 16px; }
   .intro-lead { max-width: 60ch; }
   .intro-head, .intro-lead { align-self: flex-start; }
+
+  /* Help panel: source note and links */
+  .help-foot { border-top: 1px solid var(--line); padding: 18px; display: flex; flex-direction: column; gap: 12px; background: var(--bg); border-radius: 0 0 var(--radius-lg) var(--radius-lg); }
+  .help-source-note { max-width: 72ch; color: var(--muted); line-height: 1.6; }
+  .help-foot .card-title { margin: 4px 0 0; }
+  .help-links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .help-links li { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .help-links a { color: var(--accent); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+  .help-links a:hover { text-decoration-thickness: 2px; }
+  .help-links .url { font-size: 0.85rem; color: var(--muted); overflow-wrap: anywhere; }
 </style>
 
 <header class="topbar">
@@ -458,6 +468,15 @@
       <button type="button" class="btn secondary help-btn" id="help-close">Close help</button>
     </div>
     <div id="help-items"></div>
+    <div class="help-foot">
+      <p class="help-source-note">This fictional scenario is informed by CMU’s phishing guidance, data classification guidelines, and security reporting guidance. ‘Pause, Verify, and Report’ is a course-developed decision aid. For actual work, follow current university and project-specific requirements.</p>
+      <h3 class="card-title">Sources</h3>
+      <ul class="help-links">
+        <li><a href="https://www.cmu.edu/computing/safe/secure-your/dont-take-the-bait/phishing.html" target="_blank" rel="noopener noreferrer">CMU Phishing Guidance<span aria-hidden="true"> ↗</span><span class="vh"> (opens in a new tab)</span></a><span class="url">https://www.cmu.edu/computing/safe/secure-your/dont-take-the-bait/phishing.html</span></li>
+        <li><a href="https://www.cmu.edu/data/guidelines/data-classification.html" target="_blank" rel="noopener noreferrer">CMU Guidelines for Data Classification<span aria-hidden="true"> ↗</span><span class="vh"> (opens in a new tab)</span></a><span class="url">https://www.cmu.edu/data/guidelines/data-classification.html</span></li>
+        <li><a href="https://www.cmu.edu/computing/safe/report-concerns/index.html" target="_blank" rel="noopener noreferrer">CMU Report Concerns and Digital Threats<span aria-hidden="true"> ↗</span><span class="vh"> (opens in a new tab)</span></a><span class="url">https://www.cmu.edu/computing/safe/report-concerns/index.html</span></li>
+      </ul>
+    </div>
   </aside>
 
   <!-- 1. Introduction -->
@@ -513,7 +532,7 @@
     </div>
     <div class="together">
       <span class="label">Putting the reasoning together</span>
-      <p>Uploading the spreadsheet to an unverified folder could let people without permission see participant information and unpublished results. The authority claim, short deadline, and request to bypass IT make it important to pause and verify before sharing.</p>
+      <p>Uploading the spreadsheet to an unverified folder could let people without permission see participant information and unpublished results. The authority claim, short deadline, and pressure to bypass a safeguard make it important to pause and verify before sharing.</p>
     </div>
     <p class="lead">Now use the same five questions to analyze a new request. Look carefully at the details in the new message and trace how the requested action could affect access to the information.</p>
     <div class="actions"><button type="button" class="btn" data-go="practice">Try It Yourself</button></div>
@@ -738,20 +757,20 @@
     {
       icon: "magnifier", reveal: "show-cues",
       q: "Which details should make me pause?",
-      a: "Claimed authority, urgency, pressure to bypass IT, and an unverified destination",
-      quote: "“‘Professor Chen needs’ makes the request sound official. ‘In ten minutes’ pushes me to act quickly. The message also asks me to bypass IT and upload the file to a personal folder whose access I haven’t checked. Together, these details give me reasons to pause and verify.”",
+      a: "Claimed authority, urgency, pressure to bypass a safeguard, and an unverified destination",
+      quote: "“‘Professor Chen needs’ makes the request sound official. ‘In ten minutes’ pushes me to act quickly. ‘Please do not involve IT’ is pressure to bypass a safeguard. The message also asks me to upload the file to a folder whose access I haven’t checked. Together, these details give me reasons to pause and verify.”",
       annotations: [
         { tag: "A", cue: true, src: "“Professor Chen needs”", text: "Claimed authority — invokes the professor’s position to encourage action" },
         { tag: "B", cue: true, src: "“in ten minutes” / “now”", text: "Urgency — creates pressure to act before checking" },
         { tag: "C", cue: true, src: "“Please do not involve IT”", text: "Pressure to bypass a safeguard — discourages seeking guidance" },
-        { tag: "D", cue: true, src: "“this personal Dropbox folder”", text: "Unverified destination — access and approval haven’t been checked" }
+        { tag: "D", cue: true, src: "“this personal Dropbox folder”", text: "Unverified destination — access and authorization haven’t been checked" }
       ]
     },
     {
       icon: "folder", reveal: "show-action",
       q: "What would I do if I followed the request?",
-      a: "Upload a copy of the spreadsheet to a personal folder I haven’t verified",
-      quote: "“If I upload the spreadsheet, I’ll put a copy in that folder. I haven’t confirmed who owns the folder, who can open it, or whether it is approved for this information.”",
+      a: "Upload a copy of the spreadsheet to a folder whose access I haven’t verified",
+      quote: "“Uploading the spreadsheet would put a copy in a folder whose access I haven’t verified. I haven’t confirmed that this folder is an authorized destination for the file or that the intended recipients are permitted to access its contents.”",
       annotations: [
         { tag: "ACTION", src: "“Upload it to this personal Dropbox folder”", text: "Requested action — creates another copy in a location with unverified access" }
       ],
@@ -768,9 +787,9 @@
     {
       icon: "shield",
       q: "What should I do next?",
-      a: "Pause, verify through a known channel, and seek guidance if needed",
-      quote: "“I’ll hold off on uploading and contact Professor Chen using university contact information I already have. If the request is legitimate, I’ll confirm who needs access and how the file should be shared. If I can’t verify the request or I’m unsure what to do, I’ll seek guidance using the course decision aid.”",
-      support: "Verification checks whether the request is genuine. Confirming the sharing method checks how to provide access appropriately."
+      a: "Pause, verify through a known channel, and seek guidance or report if needed",
+      quote: "“I’ll hold off on uploading and contact Professor Chen through a known university channel. If the request is genuine, I’ll confirm that the intended recipients are authorized and use a sharing method permitted for this information. If I’m unsure about the handling requirements, I’ll seek guidance. If the message remains suspicious, I’ll report it through CMU’s phishing reporting process.”",
+      support: "Verification checks whether the request is genuine. Confirming recipient authorization and the permitted sharing method checks how the information may be provided."
     }
   ];
 
@@ -799,7 +818,7 @@
       q: "What would you do if you followed the request?",
       correct: 0,
       options: [
-        { t: "A. Send a copy of the spreadsheet to an email account you haven’t verified", f: "Correct. Sending an attachment places a copy of the spreadsheet in the recipient’s inbox." },
+        { t: "A. Send a copy of the spreadsheet to an email account you haven’t verified", f: "Correct. Sending an attachment places a copy of the spreadsheet in the recipient’s inbox. As in the example, name what you haven’t verified: “I haven’t confirmed that this personal account is an authorized destination for student grades.”" },
         { t: "B. Give the recipient a link to the spreadsheet in its current location", f: "Read the requested action again. The sender asks for the spreadsheet as an attachment." },
         { t: "C. Change the original spreadsheet’s access permissions", f: "Changing permissions affects who can open the original file. Consider what sending an attachment would create in the recipient’s inbox." }
       ]
@@ -820,7 +839,7 @@
       options: [
         { t: "A. Reply to the same message and send the file if the sender confirms the address", f: "A reply goes back to the same sender. Use a known university contact method to confirm the request independently." },
         { t: "B. Send the file and copy the professor’s university address so they can review the request", f: "The attachment would already be in the personal inbox by the time the professor reviewed it. Verify before sharing the information." },
-        { t: "C. Hold off, contact the professor through a known university channel, and confirm the approved way to share the file", f: "Correct. This lets you verify the request before sharing. If it is legitimate, confirm who needs access and which sharing method is approved. Seek guidance if uncertainty remains." }
+        { t: "C. Hold off, contact the professor through a known university channel, and confirm the intended recipients and the permitted way to share the file", f: "Correct. This lets you verify the request before sharing. If the request is genuine, confirm that the intended recipients are authorized and use a sharing method permitted for this information. If you’re unsure about the handling requirements, seek guidance. If the message remains suspicious, report it through CMU’s phishing reporting process." }
       ]
     }
   ];
@@ -838,7 +857,7 @@
         ["Claimed authority", "A request invokes someone’s position or name to encourage you to act."],
         ["Urgency", "A short deadline creates pressure to act before checking."],
         ["Pressure to bypass a safeguard", "A request asks you to skip a usual check, avoid seeking help, or keep the action from others."],
-        ["Unverified destination", "You haven’t confirmed who controls the account or folder, who can access it, or whether it is appropriate for the information."]
+        ["Unverified destination", "You haven’t confirmed who controls the account or folder, who can access it, or whether it is an authorized destination for the information."]
       ],
       note: "Use these cues as reasons to pause and check the request."
     },
@@ -854,9 +873,9 @@
     {
       title: "Pause, Verify, and Report",
       items: [
-        ["Pause", "Hold off on sending, uploading, or changing access while you check the request."],
-        ["Verify", "Contact the person through a channel you already trust. Confirm the request, intended recipients, and approved sharing method."],
-        ["Seek guidance or report", "If the request remains suspicious or you’re unsure what to do, follow your organization’s guidance and reporting process."]
+        ["Pause", "Hold off on sending or uploading the file while you check the request."],
+        ["Verify", "Contact the person through a channel you already trust. Confirm the request, the intended recipients’ authorization, and the permitted sharing method."],
+        ["Seek guidance or report", "If you’re unsure how the information may be shared, seek appropriate guidance. If the message remains suspicious, follow CMU’s phishing reporting process."]
       ]
     }
   ];
