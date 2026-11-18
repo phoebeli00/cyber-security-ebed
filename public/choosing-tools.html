@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Choosing Among Tools · Student Employee Cybersecurity Onboarding Training</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#212326; --muted:#5C6066; --body:#3B3E43; --bg:#EFF0F2; --line:#D9DBDF; --line2:#B9BCC2; --soft:#F3F4F6; --soft2:#F7F8F9;
+  --dark:#26282B; --red:#C41230; --pink:#F8E7EA; --ok:#1F7A4C; --bad:#9A3A10; --warn:#8A5300; --warnbg:#FFF4DD;
+  --fs:1;
+}
+*{box-sizing:border-box}
+html{font-size:calc(16px * var(--fs))}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,"Segoe UI",system-ui,-apple-system,sans-serif;line-height:1.5}
+a{color:var(--red)}a:hover{color:#8E0C22}
+button,select,input{font-family:inherit;font-size:inherit}
+:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+img.px{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
+
+/* header */
+.topbar{background:var(--dark);border-bottom:3px solid var(--red);color:#fff}
+.topbar .in{max-width:1280px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.logo{display:flex;gap:3px}.logo span{width:8px;height:8px}
+.brand strong{font-size:1.05rem}
+.brand small{color:#B9BCC2;font-size:.82rem}
+.topbtns{display:flex;gap:8px;align-items:center}
+.tbtn{height:40px;padding:0 14px;border:1px solid #6B7076;border-radius:8px;background:transparent;color:#fff;font-weight:600;cursor:pointer}
+.tbtn[disabled]{opacity:.45;cursor:not-allowed}
+
+/* nav + stepper */
+.wrap{max-width:1280px;margin:0 auto;padding:0 24px}
+.stepper{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:12px 0 6px}
+.back{height:36px;padding:0 14px;border:1.5px solid var(--dark);border-radius:8px;background:#fff;font-weight:600;cursor:pointer;color:var(--ink)}
+.back[disabled]{border-color:var(--line);color:#8A8F96;cursor:not-allowed}
+.vsep{width:1px;height:24px;background:var(--line);margin:0 6px}
+.step{display:flex;align-items:center;gap:8px;font-size:.82rem;white-space:nowrap;color:var(--muted)}
+.step .bar{width:16px;height:2px;background:#C9CCD1}
+.step .c{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;background:#fff;border:1.5px solid var(--line2)}
+.step.done{color:var(--ink);font-weight:600}.step.done .c{background:var(--ok);border-color:var(--ok);color:#fff}.step.done .bar,.step.cur .bar{background:var(--ok)}
+.step.cur{color:var(--ink);font-weight:700}.step.cur .c{background:var(--dark);border-color:var(--dark);color:#fff}
+
+main{padding:20px 0 48px}
+.eyebrow{font-size:.75rem;font-weight:700;color:var(--red);letter-spacing:.06em;text-transform:uppercase}
+.tribar{display:flex;height:4px;width:96px}.tribar span:nth-child(1){width:32px;background:var(--red)}.tribar span:nth-child(2){width:16px;background:var(--dark)}.tribar span:nth-child(3){width:48px;background:var(--line)}
+h1{margin:0;font-size:2.5rem;font-weight:800;letter-spacing:-.01em;line-height:1.15}
+h2{margin:0;font-size:1.15rem}
+.panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.stack{display:flex;flex-direction:column;gap:14px}
+.row{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap}
+.muted{color:var(--muted)}
+.tile{display:flex;align-items:center;justify-content:center;background:var(--soft);border:1px solid var(--line);border-radius:12px;flex-shrink:0}
+.btn{height:44px;padding:0 18px;border:none;border-radius:8px;background:var(--dark);color:#fff;font-weight:700;cursor:pointer;box-shadow:3px 3px 0 var(--red);align-self:flex-start}
+.btn[disabled]{background:#C9CCD1;color:var(--muted);box-shadow:none;cursor:not-allowed}
+.btn2{height:40px;padding:0 14px;border:1.5px solid var(--dark);border-radius:8px;background:#fff;font-weight:600;cursor:pointer;color:var(--ink);align-self:flex-start}
+.notice{background:var(--pink);border-radius:14px;padding:16px 20px}
+
+/* intro tiles */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.tiles .t{background:var(--soft2);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px}
+
+/* task card */
+.kv{display:grid;grid-template-columns:190px minmax(0,1fr);row-gap:10px;column-gap:16px;font-size:.92rem}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+
+/* flip cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.flip{perspective:1200px;height:520px}
+.flip .inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.4,.2,.2,1)}
+.flip.on .inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:16px;padding:16px;display:flex;flex-direction:column}
+.front{background-color:#fff;background-image:radial-gradient(#E3E5E8 1.2px,transparent 1.2px);background-size:14px 14px;border:1px solid var(--line);border-top:6px solid var(--red);align-items:center;justify-content:center;gap:14px;text-align:center;box-shadow:0 2px 0 var(--line)}
+.front .dots{position:absolute;top:12px;right:12px;display:flex;gap:3px}.front .dots span{width:6px;height:6px}
+.front .big{width:112px;height:112px;background:#fff;border:2px solid var(--dark);border-radius:20px;box-shadow:4px 4px 0 var(--dark)}
+.pill{font-size:.8rem;line-height:1.4;color:var(--body);background:var(--soft);border-radius:999px;padding:6px 12px}
+.flipbtn{height:44px;padding:0 18px;border:2px solid var(--red);border-radius:8px;background:#fff;color:var(--red);font-weight:700;cursor:pointer}
+.back-face{transform:rotateY(180deg);background:#fff;border:2px solid var(--dark);box-shadow:4px 4px 0 var(--dark);gap:10px}
+.bhead{display:flex;align-items:center;gap:10px;padding-bottom:10px;border-bottom:2px solid var(--dark)}
+.flabel{display:flex;align-items:center;gap:6px;font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.flabel i{width:6px;height:6px;background:var(--red);flex-shrink:0}
+.ftext{font-size:.82rem;line-height:1.4}
+.exbox{margin-top:auto;font-size:.75rem;line-height:1.4;color:var(--body);background:var(--soft);border-radius:10px;padding:6px 10px}
+.flipback{margin-top:4px;height:36px;border:1px solid var(--line2);border-radius:6px;background:#fff;cursor:pointer;color:var(--ink)}
+
+/* compare */
+.pair{display:flex;gap:14px;align-items:stretch;flex-wrap:wrap}
+.ccard{flex:1 1 320px;min-width:0;background:#fff;border:2px solid var(--dark);border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;box-shadow:4px 4px 0 var(--dark)}
+.ctag{width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;background:var(--red);box-shadow:3px 3px 0 var(--dark)}
+.vs{display:flex;align-items:center;font-weight:700;color:var(--muted)}
+.crow{display:flex;flex-direction:column;gap:2px;padding:8px 10px;border-radius:6px;background:var(--soft2)}
+.crow.hot{background:var(--warnbg);box-shadow:inset 4px 0 0 var(--warn)}
+.crow .l{font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+.crow .v{font-size:.88rem;line-height:1.4}
+.big-on .crow .l{font-size:.82rem}.big-on .crow .v{font-size:1rem}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{min-height:44px;padding:0 14px;border-radius:6px;border:1px solid var(--line2);background:#fff;cursor:pointer;color:var(--ink)}
+.chip[aria-pressed=true]{background:#ECEDEF;border:2px solid var(--dark)}
+.chip.ok{border:2px solid var(--ok)}.chip.no{border:2px solid var(--bad)}.chip.miss{border:2px dashed var(--bad)}
+
+/* decide */
+.opts{display:flex;flex-direction:column;gap:10px;border:none;margin:0;padding:0}
+.opts legend{font-size:1.15rem;font-weight:600;margin-bottom:4px}
+.opt{display:flex;align-items:center;gap:12px;padding:12px 14px;min-height:52px;border-radius:8px;background:#fff;border:1px solid var(--line2);cursor:pointer}
+.opt.sel{border:2px solid var(--dark)}.opt.wrong{border:2px solid var(--bad);opacity:.75;background:var(--soft2)}.opt.right{border:2px solid var(--ok)}
+.opt input{width:18px;height:18px;margin:0;accent-color:var(--red)}
+.fb{background:#fff;border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.fb.good{border:2px solid var(--ok)}.fb.badb{border:2px solid var(--bad)}
+.fb .h{font-weight:700}.fb.good .h{color:var(--ok)}.fb.badb .h{color:var(--bad)}
+.mini{border:1px solid var(--line);border-radius:6px;overflow:hidden;font-size:.75rem}
+.mini .r{display:grid;grid-template-columns:130px repeat(2,minmax(0,1fr));gap:10px;padding:8px 10px;border-top:1px solid #E6E7EA}
+.mini .r.hd{background:var(--soft);font-weight:600;border-top:none}.mini .r.d{background:#FBEDE5}
+.mini .r2{grid-template-columns:150px minmax(0,1fr)}.mini .r2.hd{display:block}
+.explain{background:var(--soft);border-radius:6px;padding:12px 14px;display:grid;grid-template-columns:170px minmax(0,1fr);row-gap:8px;column-gap:12px;font-size:.82rem}
+select{height:44px;padding:0 10px;border:1px solid var(--line2);border-radius:6px;background:#fff;color:var(--ink);max-width:100%}
+
+/* resources drawer */
+#res{position:fixed;top:0;right:0;bottom:0;width:min(440px,100%);background:#fff;border-left:1px solid var(--line2);box-shadow:-8px 0 24px rgba(0,0,0,.08);padding:20px 22px;overflow:auto;z-index:10}
+#res[hidden]{display:none}
+#res h3{margin:0 0 6px;font-size:.95rem}
+#res p{margin:0 0 6px;font-size:.85rem}
+
+@media (prefers-reduced-motion: reduce){.flip .inner{transition:none}}
+@media (max-width:720px){h1{font-size:1.9rem}.kv,.explain{grid-template-columns:1fr}.mini .r{grid-template-columns:1fr}}
+</style>
+<link rel="stylesheet" href="/course-navigation.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="in">
+    <div class="brand">
+      <span class="logo" aria-hidden="true"><span style="background:#C41230"></span><span style="background:#fff"></span><span style="background:#9AA0A6"></span></span>
+      <strong>Student Employee Cybersecurity Onboarding Training</strong>
+      <small>Choosing Among Tools</small>
+    </div>
+    <div class="topbtns">
+      <span class="sr-only" id="tsz">Text size</span>
+      <button class="tbtn" id="fsDown" aria-label="Decrease text size">A−</button>
+      <button class="tbtn" id="fsUp" aria-label="Increase text size">A+</button>
+      <button class="tbtn" id="resBtn" aria-expanded="false" aria-controls="res">Resources &amp; definitions</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <nav class="course-navigation" aria-label="Course activities">
+    <a href="/" class="course-back">← Back to Activity 1 · Consequence Mapping</a>
+    <a href="/choosing-tools.html" aria-current="page">Activity 2 · Choosing Among Tools</a>
+    <a href="/tool-selection.html" class="course-next">Next: Activity 3 · Tool Selection Simulation →</a>
+  </nav>
+  <nav class="stepper" aria-label="Activity progress" id="stepper"></nav>
+  <main id="app" tabindex="-1"></main>
+</div>
+
+<aside id="res" hidden aria-label="Resources and definitions">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <strong style="font-size:1.05rem">Resources &amp; definitions</strong>
+    <button class="btn2" id="resClose">Close</button>
+  </div>
+  <h3>Information classification summary</h3>
+  <p><strong>Public:</strong> little or no risk if disclosed, e.g. research publications.</p>
+  <p><strong>Private:</strong> moderate risk; the default for data not marked Public or Restricted.</p>
+  <p><strong>Restricted:</strong> significant risk if disclosed; the highest level of controls applies.</p>
+  <p class="muted" style="font-size:.75rem">Adapted from <a href="https://www.cmu.edu/data/guidelines/data-classification.html" target="_blank" rel="noopener">CMU's Guidelines for Data Classification</a>.</p>
+  <h3 style="margin-top:16px">Definitions</h3>
+  <p><strong>Account ownership:</strong> who the account belongs to and who manages it: CMU or you personally.</p>
+  <p><strong>Storage:</strong> where the file is kept: university storage, a commercial cloud, a laptop, or a provider's servers.</p>
+  <p><strong>Access:</strong> who can open the file, and who decides that.</p>
+  <p><strong>Data handling:</strong> which agreements and practices apply, such as retention or using inputs to improve models.</p>
+  <h3 style="margin-top:16px">Tool selection checklist</h3>
+  <p>1. Classification and project requirement · 2. Account owner · 3. Storage · 4. Access and who manages it · 5. Agreements and data practices</p>
+</aside>
+
+<script>
+(function () {
+var I = function (n) { return 'assets/icons/' + n + '.svg'; };
+var STEPS = ['intro', 'task', 'tools', 'compare', 'decide', 'model', 'done'];
+var STEP_LABELS = ['Introduction', 'Review Task', 'Tool Cards', 'Compare', 'Decide', 'Model Explanation', 'Complete'];
+var ROWS = ['Account ownership', 'Storage', 'Access', 'Data handling'];
+var TOOLS = [
+  { id: 'drive', name: 'Approved institutional drive', sub: 'Project storage', ex: 'e.g., your project’s CMU Box folder',
+    vals: ['CMU-managed account (Andrew ID)', 'University storage, under a CMU agreement', 'Only the 4 authorized project members; the project manages the list', 'CMU agreements and security controls apply'] },
+  { id: 'enterprise', name: 'Approved enterprise tool', sub: 'CMU-licensed chat & collaboration', ex: 'e.g., your lab’s CMU Slack channel',
+    vals: ['CMU-managed account (Andrew ID)', 'CMU-licensed chat service; each upload creates a new copy in the channel', 'Everyone in the channel, including lab members who aren’t on this project', 'CMU agreements and security controls apply'] },
+  { id: 'dropbox', name: 'Personal Dropbox', sub: 'Personal cloud storage', ex: 'e.g., Dropbox signed in with your Gmail',
+    vals: ['Personal account, not CMU-managed', 'Commercial cloud servers', 'Whoever you share it with; you manage the list', 'Personal terms; CMU agreements don’t apply'] },
+  { id: 'device', name: 'Personal device', sub: 'Your own hardware', ex: 'e.g., the Downloads folder on your own laptop',
+    vals: ['Personal account, not CMU-managed', 'Your laptop’s local disk', 'Whoever you share it with; you manage the list', 'Personal terms; CMU agreements don’t apply'] },
+  { id: 'ai', name: 'Public AI tool', sub: 'Consumer AI chatbot', ex: 'e.g., ChatGPT signed in with a personal account',
+    vals: ['Personal account, not CMU-managed', 'The AI provider’s servers', 'You, plus the provider’s systems', 'Personal terms; inputs may be kept or used to improve models'] }
+];
+var BY = {}; TOOLS.forEach(function (t) { BY[t.id] = t; });
+var PAIRS = [
+  { a: 'drive', b: 'enterprise', lead: 'Both are approved by CMU.', diff: [1, 2],
+    notice: 'Same CMU account and data handling. Storage and access differ: posting in the channel creates a new copy outside the project folder, and everyone in the channel can open it, including lab members who aren’t on this project.' },
+  { a: 'dropbox', b: 'device', lead: 'Both are yours personally.', diff: [1],
+    notice: 'Only storage differs: a commercial cloud versus your laptop. Moving the file between them doesn’t change who owns the account or which terms apply.' },
+  { a: 'enterprise', b: 'ai', lead: 'Both are tools you could use to work with the file.', diff: [0, 1, 2, 3],
+    notice: 'Every field differs. The public AI tool sits outside CMU: a personal account, the provider’s servers, and terms that may let inputs be kept or used to improve models.' }
+];
+var RETRY = {
+  enterprise: { rows: [1, 2], text: 'Look at Storage and Access. Posting the file in the lab channel creates a new copy, and everyone in the channel, including lab members who aren’t on this project, could open participant IDs. The requirement limits access to authorized project members.' },
+  dropbox: { rows: [0, 3], text: 'Look at Account ownership and Data handling. Even if you shared it only with the team, the file would sit in your personal account, under personal terms that CMU agreements don’t cover.' },
+  device: { rows: [0, 3], text: 'Look at Account ownership and Data handling. Your own laptop isn’t CMU-managed, and CMU agreements don’t cover what happens to the file there.' },
+  ai: { rows: [0, 3], text: 'Look at Account ownership and Data handling. The file would leave CMU for the provider’s servers, under personal terms that may let inputs be kept or used to improve models.' }
+};
+var TOOL_FB = {
+  drive: { text: 'It is the only environment where every field fits a Restricted file: a CMU-managed account, university storage under a CMU agreement, access limited to the authorized members, and CMU data practices.' },
+  enterprise: { diff: [1, 2], text: 'Your choice matches the drive on account and data handling, but differs in Storage and Access. Posting the file creates a new copy in the channel, and lab members who aren’t on this project could open participant IDs. The requirement limits access to the project team.' },
+  dropbox: { diff: [0, 1, 2, 3], text: 'Your choice differs in every field. Even if you shared it only with the team, the file would sit in your personal account under personal terms, and you alone would manage access.' },
+  device: { diff: [0, 1, 2, 3], text: 'Your choice differs in every field. A personal laptop isn’t CMU-managed, you alone manage access, and CMU agreements don’t cover it.' },
+  ai: { diff: [0, 1, 2, 3], text: 'Your choice differs in every field. The file would leave CMU for the provider’s servers, and inputs may be kept or used to improve models.' }
+};
+var RAT = {
+  account: { ok: false, label: 'It uses a CMU account, so it’s approved for any CMU file.', head: 'Partly right', text: 'A CMU account is necessary but not enough. The approved enterprise tool also uses a CMU account, yet everyone in the lab channel, including people outside the project, could open the file. Access matters too.' },
+  share: { ok: false, label: 'Only the people I share it with can open it.', head: 'Partly right', text: 'Limiting access matters, but a personal Dropbox can be shared with just the team too. What also matters is who owns the account, who manages access, and which agreements apply.' },
+  full: { ok: true, label: 'It’s CMU-managed, keeps the file under CMU agreements, and limits access to the authorized project members.', head: '✓ This reason connects the choice to every requirement', text: 'Your reason links account ownership, data handling, and access to what the project guide requires for a Restricted file.' },
+  easy: { ok: false, label: 'It’s the easiest place for the team to find the file.', head: 'Not quite', text: 'Convenience doesn’t address the file’s sensitivity. A good reason comes from the requirements: who owns the account, who can open the file, and which agreements apply.' }
+};
+var SELF = ['Did my choice fit the file’s classification and handling requirement?', 'Did my reason mention who owns the account and who controls access?', 'Did my reason explain why the similar-looking options don’t fit?'];
+
+var st = { step: 'intro', opened: [], flipped: [], pair: 0, sels: [[], [], []], chk: [false, false, false], tool: null, toolDone: false, tries: [], rat: '', ratDone: false, checks: [false, false, false], big: false };
+var app = document.getElementById('app');
+
+function px(id, size, extra) { return '<img class="px" src="' + I(id) + '" alt="" width="' + size + '" height="' + size + '"' + (extra || '') + '>'; }
+function tile(id, box, size, style) { return '<span class="tile" style="width:' + box + 'px;height:' + box + 'px;' + (style || '') + '">' + px(id, size) + '</span>'; }
+
+function renderStepper() {
+  var idx = STEPS.indexOf(st.step);
+  var h = '<button class="back" data-a="back"' + (idx <= 0 ? ' disabled' : '') + ' aria-label="Back to the previous page">← Back</button><span class="vsep" aria-hidden="true"></span>';
+  STEP_LABELS.forEach(function (l, i) {
+    var cls = i < idx ? 'done' : i === idx ? 'cur' : '';
+    h += '<span class="step ' + cls + '"' + (i === idx ? ' aria-current="step"' : '') + '>' + (i ? '<span class="bar" aria-hidden="true"></span>' : '') + '<span class="c">' + (i < idx ? '✓' : (i + 1)) + '</span>' + l + '</span>';
+  });
+  document.getElementById('stepper').innerHTML = h;
+}
+
+var V = {};
+V.intro = function () {
+  var tiles = [['review', 'Review', 'The task, the file, and its handling requirement.'], ['cards', 'Explore', 'Flip five tool cards.'], ['compare', 'Compare', 'Find where pairs of tools differ.'], ['decide', 'Decide', 'Choose a tool and the reason that supports it.'], ['model', 'Check', 'Compare your response with a model explanation.']];
+  return '<div class="stack" style="max-width:920px">' +
+    '<span class="eyebrow">Week 2 · Choosing Among Tools</span><h1>Where should a Restricted file live?</h1><span class="tribar" aria-hidden="true"><span></span><span></span><span></span></span>' +
+    '<span class="muted">Estimated time: 16 minutes</span>' +
+    '<p style="margin:0;font-size:1rem;line-height:1.6;color:var(--body)">On your first day as a research assistant, you’re asked to store a questionnaire extract and review it this week. Five places could hold the file. They can look alike, but they differ in ways that matter. In this activity you’ll find those differences yourself, then use them to choose.</p>' +
+    '<div class="notice"><span class="eyebrow">Simulation notice</span><p style="margin:6px 0 0;color:var(--body)">People, files, tools, and project details are fictional. Tool descriptions are simplified for practice and adapted from CMU guidance. The project guide is fictional and is not CMU policy. Check your own project’s documentation and CMU’s guidelines for real work.</p></div>' +
+    '<div class="panel stack"><span class="eyebrow">What you’ll do</span><div class="tiles">' +
+    tiles.map(function (t) { return '<div class="t">' + tile(t[0], 52, 32, 'background:#fff') + '<strong>' + t[1] + '</strong><span style="font-size:.82rem;color:var(--body)">' + t[2] + '</span></div>'; }).join('') +
+    '</div></div><button class="btn" data-a="go" data-to="task">Review the Task →</button></div>';
+};
+V.task = function () {
+  return '<div class="row"><div class="stack" style="flex:1 1 520px">' +
+    '<span class="eyebrow">Step 1 · Review the task</span>' +
+    '<div class="panel" style="padding:0;overflow:hidden"><div style="background:var(--soft);padding:8px 14px;font-size:.75rem" class="muted">Message received</div><div style="padding:18px 20px" class="stack">' +
+    '<span class="muted" style="font-size:.82rem"><strong style="color:var(--ink)">From</strong> Priya R. · Lab manager &nbsp; <strong style="color:var(--ink)">Subject</strong> Questionnaire extract</span>' +
+    '<p style="margin:0">Welcome to the team! I’ve attached the follow-up questionnaire extract. Please store it somewhere you can review the responses this week. We’ll go through your notes at Friday’s meeting.</p></div></div>' +
+    '<div class="panel stack" style="border:1.5px solid var(--ink)"><span class="eyebrow">Task &amp; data card</span>' +
+    '<div style="display:flex;align-items:center;gap:12px">' + tile('file', 52, 32) + '<span class="mono">Questionnaire_Extract.xlsx</span></div>' +
+    '<div class="kv"><span class="muted">Task</span><span>Store the file and review the responses this week</span><span class="muted">Contents</span><span>Participant IDs and individual questionnaire responses</span><span class="muted">Classification</span><span><strong>Restricted</strong> (recorded in the project guide)</span><span class="muted">Handling requirement</span><span>Access limited to authorized project members: Dr. Lee, Priya R., Jordan K., and you</span></div></div></div>' +
+    '<div class="stack" style="flex:0 1 400px;padding-top:30px"><div class="panel stack"><h2>Before you look at the tools</h2><p style="margin:0;color:var(--body)">Keep the classification and the handling requirement in mind. Next you’ll flip five tool cards. Each describes the same four things: account ownership, storage, access, and data handling.</p><p class="muted" style="margin:0;font-size:.82rem">Not sure what “Restricted” means? Open Resources &amp; definitions at the top.</p></div>' +
+    '<button class="btn" data-a="go" data-to="tools">Explore the Tool Cards →</button></div></div>';
+};
+V.tools = function () {
+  var h = '<div class="stack"><div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap"><div class="stack" style="gap:4px"><span class="eyebrow">Step 2 · Explore the tool cards</span><h2>Flip each card. Every card uses the same four fields.</h2></div><span class="muted" id="flipCount" aria-live="polite">' + st.opened.length + ' of 5 flipped</span></div><div class="cards">';
+  TOOLS.forEach(function (t, n) {
+    var on = st.flipped.indexOf(t.id) !== -1, seen = st.opened.indexOf(t.id) !== -1;
+    h += '<div class="flip' + (on ? ' on' : '') + '" data-card="' + t.id + '"><div class="inner">' +
+      '<div class="face front"' + (on ? ' aria-hidden="true"' : '') + '><span class="dots" aria-hidden="true"><span style="background:#C41230"></span><span style="background:#26282B"></span><span style="background:#D9DBDF"></span></span>' +
+      '<span class="eyebrow" style="letter-spacing:.08em">Tool ' + (n + 1) + '</span>' + tile(t.id, 112, 72, 'background:#fff;border:2px solid var(--dark);border-radius:20px;box-shadow:4px 4px 0 var(--dark)') +
+      '<strong style="font-size:1.1rem;line-height:1.3">' + t.name + '</strong><span class="muted" style="font-size:.82rem">' + t.sub + '</span><span class="pill">' + t.ex + '</span>' +
+      '<button class="flipbtn" data-a="flip" data-id="' + t.id + '"' + (on ? ' tabindex="-1"' : '') + '>' + (seen ? '✓ Seen · flip again' : 'Flip to see details') + '</button></div>' +
+      '<div class="face back-face"' + (on ? '' : ' aria-hidden="true"') + '><div class="bhead">' + tile(t.id, 42, 28) + '<div><strong style="font-size:.9rem;display:block;line-height:1.25">' + t.name + '</strong><span class="muted" style="font-size:.7rem">' + t.sub + '</span></div></div>' +
+      ROWS.map(function (r, i) { return '<div><span class="flabel"><i aria-hidden="true"></i>' + r + '</span><div class="ftext">' + t.vals[i] + '</div></div>'; }).join('') +
+      '<span class="exbox">' + t.ex + '</span><button class="flipback" data-a="flip" data-id="' + t.id + '"' + (on ? '' : ' tabindex="-1"') + '>↺ Flip back</button></div></div></div>';
+  });
+  var locked = st.opened.length < 5;
+  h += '</div><div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap"><button class="btn" id="toCompare" data-a="go" data-to="compare"' + (locked ? ' disabled' : '') + '>Compare the Tools →</button><span class="muted" id="toolsHint">' + (locked ? 'Flip all five cards to continue.' : 'All five seen. Next, you’ll compare them in pairs.') + '</span></div></div>';
+  return h;
+};
+V.compare = function () {
+  var p = PAIRS[st.pair], sel = st.sels[st.pair], checked = st.chk[st.pair];
+  function card(id, tag) {
+    var t = BY[id];
+    return '<div class="ccard"><div class="bhead" style="gap:12px"><span class="ctag">' + tag + '</span>' + tile(id, 52, 34) + '<div><strong style="font-size:' + (st.big ? '1.15rem' : '1rem') + ';display:block;line-height:1.25">' + t.name + '</strong><span class="muted" style="font-size:.75rem;font-style:italic">' + t.ex + '</span></div></div>' +
+      ROWS.map(function (r, ri) { var d = p.diff.indexOf(ri) !== -1; return '<div class="crow' + (checked && d ? ' hot' : '') + '"><span class="l">' + (checked ? (d ? '≠ ' : '= ') : '') + r + '</span><span class="v">' + t.vals[ri] + '</span></div>'; }).join('') + '</div>';
+  }
+  var exact = checked && sel.length === p.diff.length && p.diff.every(function (d) { return sel.indexOf(d) !== -1; });
+  var h = '<div class="stack"><div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap"><div class="stack" style="gap:4px"><span class="eyebrow">Step 3 · Compare · Pair ' + (st.pair + 1) + ' of 3</span><h2>' + p.lead + ' Where do <u>' + BY[p.a].name + '</u> (A) and <u>' + BY[p.b].name + '</u> (B) differ?</h2></div>' +
+    '<button class="btn2" data-a="big" aria-pressed="' + st.big + '">' + (st.big ? 'Smaller text' : 'Enlarge cards') + '</button></div>' +
+    '<div class="pair' + (st.big ? ' big-on' : '') + '">' + card(p.a, 'A') + '<div class="vs">vs</div>' + card(p.b, 'B') + '</div>' +
+    '<div class="panel stack"><strong id="pq">Select every field where A and B differ.</strong><div class="chips" role="group" aria-labelledby="pq">';
+  ROWS.forEach(function (r, ri) {
+    var on = sel.indexOf(ri) !== -1, cls = '', pre = '';
+    if (checked) { var should = p.diff.indexOf(ri) !== -1; if (on && should) { cls = ' ok'; pre = '✓ '; } else if (on) { cls = ' no'; pre = '✗ '; } else if (should) { cls = ' miss'; pre = 'Missed: '; } }
+    h += '<button class="chip' + cls + '" data-a="row" data-i="' + ri + '" aria-pressed="' + on + '"' + (checked ? ' disabled' : '') + '>' + pre + r + '</button>';
+  });
+  h += '</div>';
+  if (!checked) h += '<button class="btn" data-a="check"' + (sel.length ? '' : ' disabled') + '>Check my comparison</button>';
+  else h += '<div class="stack" style="gap:8px" aria-live="polite"><strong style="color:' + (exact ? 'var(--ok)' : 'var(--warn)') + '">' + (exact ? '✓ You found every difference.' : 'Here is where they differ.') + '</strong><span>' + p.notice + '</span>' +
+    '<button class="btn" data-a="nextPair">' + (st.pair >= PAIRS.length - 1 ? 'Make Your Decision →' : 'Next pair →') + '</button></div>';
+  return h + '</div></div>';
+};
+V.decide = function () {
+  var tries = st.tries, retrying = !st.toolDone && tries.length === 1;
+  var h = '<div class="row"><div class="stack" style="flex:0 1 560px"><span class="eyebrow">Step 4 · Decide</span><fieldset class="opts"><legend>Where will you store and review Questionnaire_Extract.xlsx?</legend>';
+  TOOLS.forEach(function (t) {
+    var wrong = tries.indexOf(t.id) !== -1, chosen = st.tool === t.id, mark = '';
+    var cls = chosen ? ' sel' : '';
+    if (wrong) { cls = ' wrong'; mark = '✗ '; }
+    if (st.toolDone && t.id === 'drive') { cls = ' right'; mark = '✓ '; }
+    var dis = st.toolDone || wrong;
+    h += '<label class="opt' + cls + '"><input type="radio" name="tool" value="' + t.id + '" data-a="pick"' + (chosen ? ' checked' : '') + (dis ? ' disabled' : '') + '>' + tile(t.id, 40, 26, 'border-radius:10px') +
+      '<span><strong style="display:block">' + mark + t.name + '</strong><span class="muted" style="font-size:.75rem">' + t.ex + '</span></span></label>';
+  });
+  h += '</fieldset>';
+  if (!st.toolDone) h += '<button class="btn" data-a="submitTool"' + (!st.tool || tries.indexOf(st.tool) !== -1 ? ' disabled' : '') + '>' + (retrying ? 'Submit my second choice' : 'Submit my choice') + '</button>';
+  h += '<span class="muted" style="font-size:.82rem">Requirement: Restricted · access limited to authorized project members.</span></div><div class="stack" style="flex:1 1 420px;min-width:0" aria-live="polite">';
+  if (!st.toolDone && !retrying) return h + '<div style="border:1px dashed var(--line2);border-radius:14px;padding:24px;margin-top:30px" class="muted">Use the differences you found. Feedback appears here after you submit.</div></div></div>';
+  var right = st.toolDone && st.tool === 'drive';
+  var last = tries[tries.length - 1];
+  if (retrying) {
+    h += '<div class="fb badb"><span class="h">✗ Not quite. Try once more.</span><span>' + RETRY[last].text + '</span><div class="mini"><div class="r r2 hd">Look again at these fields of your choice: ' + BY[last].name + '</div>' +
+      RETRY[last].rows.map(function (i) { return '<div class="r r2 d"><strong>' + ROWS[i] + '</strong><span>' + BY[last].vals[i] + '</span></div>'; }).join('') + '</div><strong>Choose again on the left. You have one more try.</strong></div>';
+    return h + '</div></div>';
+  }
+  var tf = TOOL_FB[st.tool];
+  h += '<div class="fb ' + (right ? 'good' : 'badb') + '"><span class="h">' + (right ? (tries.length ? '✓ Yes, on your second try. The approved institutional drive is the appropriate tool.' : '✓ Yes. The approved institutional drive is the appropriate tool.') : '✗ The appropriate tool is the approved institutional drive.') + '</span><span>' + tf.text + '</span>';
+  if (!right) h += '<div class="mini"><div class="r hd"><span class="muted">Field</span><span>Your choice: ' + BY[st.tool].name + '</span><span>Approved institutional drive</span></div>' +
+    ROWS.map(function (r, i) { var d = tf.diff.indexOf(i) !== -1; return '<div class="r' + (d ? ' d' : '') + '"><strong>' + (d ? '≠ ' : '= ') + r + '</strong><span>' + BY[st.tool].vals[i] + '</span><span>' + BY.drive.vals[i] + '</span></div>'; }).join('') + '</div>';
+  h += '</div><div class="panel stack"><label for="rat"><strong>Which reason best supports choosing the approved institutional drive?</strong></label><select id="rat" data-a="rat"' + (st.ratDone ? ' disabled' : '') + '><option value="">Select a reason…</option>' +
+    Object.keys(RAT).map(function (k) { return '<option value="' + k + '"' + (st.rat === k ? ' selected' : '') + '>' + RAT[k].label + '</option>'; }).join('') + '</select>';
+  if (!st.ratDone) h += '<button class="btn" data-a="submitRat"' + (st.rat ? '' : ' disabled') + '>Submit my reason</button>';
+  else {
+    var r = RAT[st.rat];
+    h += '<strong style="color:' + (r.ok ? 'var(--ok)' : 'var(--warn)') + '">' + r.head + '</strong><span>' + r.text + '</span><div class="explain"><strong>Information sensitivity</strong><span>Participant IDs and individual responses make the extract Restricted.</span><strong>Account ownership</strong><span>The drive is a CMU-managed account, so CMU agreements and security controls apply.</span><strong>Access</strong><span>Only the four authorized members can open it, and the project, not one person, manages that list.</span><strong>Requirements</strong><span>That matches the project guide: Restricted, with access limited to authorized project members.</span></div>' +
+      '<button class="btn" data-a="go" data-to="model">Compare with the Model Explanation →</button>';
+  }
+  return h + '</div></div></div>';
+};
+V.model = function () {
+  var tries = st.tries, first = tries.length ? tries[0] : st.tool;
+  var second = tries.length ? (tries[1] || st.tool) : null;
+  var r = RAT[st.rat];
+  var found = PAIRS.filter(function (p, i) { return st.chk[i]; }).map(function (p) { return '<span style="font-size:.82rem">≠ ' + BY[p.a].name + ' vs ' + BY[p.b].name + ': ' + p.diff.map(function (d) { return ROWS[d]; }).join(', ') + '</span>'; }).join('');
+  return '<div class="row"><div class="panel stack" style="flex:0 1 420px"><span class="eyebrow">Your response</span>' +
+    '<div><span class="muted" style="font-size:.75rem">First tool selection</span><strong style="display:block">' + (first === 'drive' ? '✓ ' : '✗ ') + (first ? BY[first].name : '') + '</strong>' + (second ? '<span class="muted" style="font-size:.82rem">Second try: ' + (second === 'drive' ? '✓ ' : '✗ ') + BY[second].name + '</span>' : '') + '</div>' +
+    '<div><span class="muted" style="font-size:.75rem">Your reason</span><div>' + (r ? (r.ok ? '✓ ' : '◐ ') + r.label : '') + '</div></div>' +
+    '<div class="stack" style="gap:4px"><span class="muted" style="font-size:.75rem">Differences you found</span>' + found + '</div>' +
+    '<button class="btn2" data-a="revisit">Revisit the comparisons</button></div>' +
+    '<div class="stack" style="flex:1 1 480px"><div class="panel stack" style="border:1.5px solid var(--ink)"><span style="display:flex;align-items:center;gap:10px">' + tile('model', 40, 26, 'border-radius:10px') + '<span class="eyebrow">Model explanation</span></span>' +
+    '<p style="margin:0;line-height:1.65">I’d store the extract in the <strong>approved institutional drive</strong>. The file holds participant IDs and individual responses, so the project guide classifies it as Restricted and limits access to authorized project members. The drive is a <strong>CMU-managed account</strong>, so the file stays under CMU agreements and security controls. <strong>Access</strong> is limited to the four authorized members and managed by the project. The approved enterprise tool, the lab’s Slack channel, is also CMU-managed, but posting there creates another copy that everyone in the channel can open, including people outside the project. Personal Dropbox, my own laptop, and a public AI tool all put the file in a personal account under personal terms, wherever it’s stored.</p></div>' +
+    '<div class="panel stack"><strong>Check your response against the model</strong>' +
+    SELF.map(function (t, i) { return '<label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer"><input type="checkbox" data-a="self" data-i="' + i + '"' + (st.checks[i] ? ' checked' : '') + ' style="width:18px;height:18px;margin:3px 0 0;accent-color:var(--red)"><span>' + t + '</span></label>'; }).join('') +
+    '<span class="muted" style="font-size:.82rem">If one is missing, reread the explanation and revisit the comparisons.</span></div>' +
+    '<button class="btn" data-a="go" data-to="done">Finish Activity →</button></div></div>';
+};
+V.done = function () {
+  return '<div class="stack" style="max-width:860px">' + tile('decide', 72, 44, 'background:#fff;border:2px solid var(--dark);box-shadow:4px 4px 0 var(--dark)') +
+    '<h1 style="font-size:2.1rem">Activity complete</h1><p style="margin:0;line-height:1.6">You compared five tool environments and matched one to a Restricted file. Tools that look alike can still differ in who owns the account, where the file is stored, who can open it, and how the data is handled.</p>' +
+    '<div class="panel stack"><strong>Tool selection checklist</strong><ol style="margin:0;padding-left:20px;line-height:1.7"><li>How is the information classified, and what does the project require?</li><li>Who owns the account?</li><li>Where is the file stored?</li><li>Who can open it, and who manages that?</li><li>Which agreements and data practices apply?</li></ol></div>' +
+    '<p style="margin:0">In the <strong>Week 2 Scenario Analysis</strong>, you’ll use the same checklist on a new case.</p><button class="btn2" data-a="go" data-to="model">Review My Work</button></div>';
+};
+
+function render(focus) {
+  renderStepper();
+  app.innerHTML = V[st.step]();
+  if (focus) { app.focus(); window.scrollTo(0, 0); }
+}
+function go(step) { st.step = step; render(true); }
+
+document.addEventListener('click', function (e) {
+  var el = e.target.closest('[data-a]'); if (!el || el.disabled) return;
+  var a = el.getAttribute('data-a');
+  if (a === 'go') go(el.getAttribute('data-to'));
+  else if (a === 'back') {
+    var i = STEPS.indexOf(st.step);
+    if (st.step === 'compare' && st.pair > 0) { st.pair--; render(true); }
+    else if (i > 0) { if (STEPS[i - 1] === 'compare') st.pair = PAIRS.length - 1; go(STEPS[i - 1]); }
+  }
+  else if (a === 'flip') {
+    var id = el.getAttribute('data-id');
+    var k = st.flipped.indexOf(id); if (k === -1) st.flipped.push(id); else st.flipped.splice(k, 1);
+    if (st.opened.indexOf(id) === -1) st.opened.push(id);
+    var c = document.querySelector('[data-card="' + id + '"]'), on = st.flipped.indexOf(id) !== -1;
+    c.classList.toggle('on', on);
+    var fr = c.querySelector('.front'), bk = c.querySelector('.back-face');
+    fr.setAttribute('aria-hidden', on); bk.setAttribute('aria-hidden', !on);
+    fr.querySelector('.flipbtn').tabIndex = on ? -1 : 0; bk.querySelector('.flipback').tabIndex = on ? 0 : -1;
+    fr.querySelector('.flipbtn').textContent = '✓ Seen · flip again';
+    setTimeout(function () { (on ? bk.querySelector('.flipback') : fr.querySelector('.flipbtn')).focus(); }, 50);
+    document.getElementById('flipCount').textContent = st.opened.length + ' of 5 flipped';
+    var done = st.opened.length >= 5;
+    document.getElementById('toCompare').disabled = !done;
+    document.getElementById('toolsHint').textContent = done ? 'All five seen. Next, you’ll compare them in pairs.' : 'Flip all five cards to continue.';
+  }
+  else if (a === 'big') { st.big = !st.big; render(); }
+  else if (a === 'row') { var s = st.sels[st.pair], ri = +el.getAttribute('data-i'), j = s.indexOf(ri); if (j === -1) s.push(ri); else s.splice(j, 1); render(); }
+  else if (a === 'check') { st.chk[st.pair] = true; render(); }
+  else if (a === 'nextPair') { if (st.pair >= PAIRS.length - 1) go('decide'); else { st.pair++; render(true); } }
+  else if (a === 'submitTool') {
+    var cur = st.tool; if (!cur || st.tries.indexOf(cur) !== -1) return;
+    if (cur === 'drive') st.toolDone = true;
+    else if (st.tries.length >= 1) { st.tries.push(cur); st.toolDone = true; }
+    else { st.tries.push(cur); st.tool = null; }
+    render();
+  }
+  else if (a === 'submitRat') { if (st.rat) { st.ratDone = true; render(); } }
+  else if (a === 'revisit') { st.pair = PAIRS.length - 1; go('compare'); }
+});
+document.addEventListener('change', function (e) {
+  var a = e.target.getAttribute('data-a');
+  if (a === 'pick' && !st.toolDone) { st.tool = e.target.value; render(); }
+  else if (a === 'rat' && !st.ratDone) { st.rat = e.target.value; render(); }
+  else if (a === 'self') { st.checks[+e.target.getAttribute('data-i')] = e.target.checked; }
+});
+
+// resources drawer + text size
+var res = document.getElementById('res'), resBtn = document.getElementById('resBtn');
+function setRes(open) { res.hidden = !open; resBtn.setAttribute('aria-expanded', open); if (open) document.getElementById('resClose').focus(); else resBtn.focus(); }
+resBtn.onclick = function () { setRes(res.hidden); };
+document.getElementById('resClose').onclick = function () { setRes(false); };
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !res.hidden) setRes(false); });
+var fs = 1, fsUp = document.getElementById('fsUp'), fsDown = document.getElementById('fsDown');
+function setFs(v) { fs = Math.max(1, Math.min(1.3, v)); document.documentElement.style.setProperty('--fs', fs); fsDown.disabled = fs <= 1; fsUp.disabled = fs >= 1.3; }
+fsUp.onclick = function () { setFs(fs + 0.15); }; fsDown.onclick = function () { setFs(fs - 0.15); }; setFs(1);
+
+render();
+})();
+</script>
+</body>
+</html>

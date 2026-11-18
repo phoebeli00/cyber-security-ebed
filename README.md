@@ -23,6 +23,7 @@ Open this repository folder in VS Code. The installed Claude Code and Codex exte
 ## Activities
 
 - Activity 1 — Consequence Mapping: `public/training.html`, available at `/`.
+- Activity 2 — Choosing Among Tools: `public/choosing-tools.html`, available at `/choosing-tools.html`. See [the Activity 2 notes](README-activity2.md).
 - Activity 3 — Tool Selection Simulation: `public/tool-selection.html`, available at `/tool-selection.html`.
 
-Both pages include course activity navigation.
+All three pages include course navigation, with Back and Next controls for adjacent activities.
