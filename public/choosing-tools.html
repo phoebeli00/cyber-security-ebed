@@ -35,8 +35,6 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
 
 /* nav + stepper */
 .wrap{max-width:1280px;margin:0 auto;padding:0 24px}
-.acts{display:flex;gap:20px;flex-wrap:wrap;padding:14px 0 4px;font-size:.92rem}
-.acts a{color:var(--ink)}.acts a[aria-current]{font-weight:700}
 .stepper{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:12px 0 6px}
 .back{height:36px;padding:0 14px;border:1.5px solid var(--dark);border-radius:8px;background:#fff;font-weight:600;cursor:pointer;color:var(--ink)}
 .back[disabled]{border-color:var(--line);color:#8A8F96;cursor:not-allowed}
@@ -62,9 +60,21 @@ h2{margin:0;font-size:1.15rem}
 .btn2{height:40px;padding:0 14px;border:1.5px solid var(--dark);border-radius:8px;background:#fff;font-weight:600;cursor:pointer;color:var(--ink);align-self:flex-start}
 .notice{background:var(--pink);border-radius:14px;padding:16px 20px}
 
-/* intro tiles */
-.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
-.tiles .t{background:var(--soft2);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px}
+/* Introduction */
+.intro{max-width:1024px;gap:24px}
+.intro-heading{gap:10px}
+.intro-lead{max-width:68ch;margin:0;font-size:1.15rem;line-height:1.7}
+.intro-goal{padding:18px 22px;border-radius:18px}
+.intro-goal p,.intro-instructions p,.intro-notice p{margin:0}
+.intro-instructions{gap:20px;padding:24px 26px;border-radius:18px;box-shadow:0 8px 24px rgba(16,18,24,.08)}
+.intro-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.intro-steps li{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:16px;background:var(--bg)}
+.intro-steps strong{display:block;font-size:1.1rem}
+.intro-steps p,.intro-instructions .instructions-help{color:var(--muted)}
+.intro-footer{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.intro-notice{display:flex;flex-direction:column;gap:6px}
+.intro-notice h3{margin:0}
+@media(max-width:860px){.intro-steps{grid-template-columns:minmax(0,1fr)}}
 
 /* task card */
 .kv{display:grid;grid-template-columns:190px minmax(0,1fr);row-gap:10px;column-gap:16px;font-size:.92rem}
@@ -129,6 +139,7 @@ select{height:44px;padding:0 10px;border:1px solid var(--line2);border-radius:6p
 @media (prefers-reduced-motion: reduce){.flip .inner{transition:none}}
 @media (max-width:720px){h1{font-size:1.9rem}.kv,.explain{grid-template-columns:1fr}.mini .r{grid-template-columns:1fr}}
 </style>
+<link rel="stylesheet" href="/course-navigation.css">
 </head>
 <body>
 <header class="topbar">
@@ -148,10 +159,10 @@ select{height:44px;padding:0 10px;border:1px solid var(--line2);border-radius:6p
 </header>
 
 <div class="wrap">
-  <nav class="acts" aria-label="Course activities">
-    <a href="/">Activity 1 · Consequence Mapping</a>
+  <nav class="course-navigation" aria-label="Course activities">
+    <a href="/" class="course-back">← Back to Activity 1 · Consequence Mapping</a>
     <a href="/choosing-tools.html" aria-current="page">Activity 2 · Choosing Among Tools</a>
-    <a href="/tool-selection.html">Activity 3 · Tool Selection Simulation</a>
+    <a href="/tool-selection.html" class="course-next">Next: Activity 3 · Tool Selection Simulation →</a>
   </nav>
   <nav class="stepper" aria-label="Activity progress" id="stepper"></nav>
   <main id="app" tabindex="-1"></main>
@@ -243,14 +254,15 @@ function renderStepper() {
 var V = {};
 V.intro = function () {
   var tiles = [['review', 'Review', 'The task, the file, and its handling requirement.'], ['cards', 'Explore', 'Flip five tool cards.'], ['compare', 'Compare', 'Find where pairs of tools differ.'], ['decide', 'Decide', 'Choose a tool and the reason that supports it.'], ['model', 'Check', 'Compare your response with a model explanation.']];
-  return '<div class="stack" style="max-width:920px">' +
-    '<span class="eyebrow">Week 2 · Choosing Among Tools</span><h1>Where should a Restricted file live?</h1><span class="tribar" aria-hidden="true"><span></span><span></span><span></span></span>' +
+  return '<div class="intro stack">' +
+    '<div class="intro-heading stack"><span class="eyebrow">Week 2</span><h1>Where should a Restricted file live?</h1><span class="tribar" aria-hidden="true"><span></span><span></span><span></span></span>' +
     '<span class="muted">Estimated time: 16 minutes</span>' +
-    '<p style="margin:0;font-size:1rem;line-height:1.6;color:var(--body)">On your first day as a research assistant, you’re asked to store a questionnaire extract and review it this week. Five places could hold the file. They can look alike, but they differ in ways that matter. In this activity you’ll find those differences yourself, then use them to choose.</p>' +
-    '<div class="notice"><span class="eyebrow">Simulation notice</span><p style="margin:6px 0 0;color:var(--body)">People, files, tools, and project details are fictional. Tool descriptions are simplified for practice and adapted from CMU guidance. The project guide is fictional and is not CMU policy. Check your own project’s documentation and CMU’s guidelines for real work.</p></div>' +
-    '<div class="panel stack"><span class="eyebrow">What you’ll do</span><div class="tiles">' +
-    tiles.map(function (t) { return '<div class="t">' + tile(t[0], 52, 32, 'background:#fff') + '<strong>' + t[1] + '</strong><span style="font-size:.82rem;color:var(--body)">' + t[2] + '</span></div>'; }).join('') +
-    '</div></div><button class="btn" data-a="go" data-to="task">Review the Task →</button></div>';
+    '<p class="intro-lead">On your first day as a research assistant, you’re asked to store a questionnaire extract and review it this week. Five places could hold the file. They can look alike, but they differ in ways that matter.</p></div>' +
+    '<section class="intro-goal notice"><h2 class="eyebrow">Learning goal</h2><p>By the end of this activity, you should be able to compare tools by account ownership, storage, access, and data handling, then explain which tool fits the requirements for a Restricted file.</p></section>' +
+    '<section class="intro-instructions panel stack"><h2 class="eyebrow">Instructions</h2><p>In this activity you’ll find those differences yourself, then use them to choose.</p><ol class="intro-steps">' +
+    tiles.map(function (t) { return '<li>' + tile(t[0], 52, 32, 'background:#fff') + '<div><strong>' + t[1] + '</strong><p>' + t[2] + '</p></div></li>'; }).join('') +
+    '</ol><div class="intro-notice"><h3 class="eyebrow">Simulation notice</h3><p>People, files, tools, and project details are fictional. Tool descriptions are simplified for practice and adapted from CMU guidance. The project guide is fictional and is not CMU policy. Check your own project’s documentation and CMU’s guidelines for real work.</p></div>' +
+    '<div class="intro-footer"><p class="instructions-help">You can open Resources &amp; definitions at any time.</p><button class="btn" data-a="go" data-to="task">Review the Task →</button></div></section></div>';
 };
 V.task = function () {
   return '<div class="row"><div class="stack" style="flex:1 1 520px">' +

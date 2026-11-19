@@ -1,0 +1,1270 @@
+<!doctype html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="/course-navigation.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>html{padding:0}body{margin:0}[hidden]{display:none!important}</style>
+<title>Tool Selection Simulation</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Pixelify+Sans:wght@400..700&display=swap">
+<!--
+  DEVELOPER NOTES (not shown to students)
+  Activity 3: Tool Selection Simulation with Feedback and Revision. Estimated duration: 17 minutes.
+  LO2: Select, justify, and apply an appropriate tool or safer alternative after considering information
+  sensitivity, tool practices, permissions, and uncertainty.
+  Records (initial, revised, final setup, feedback topics) stay in memory on this page only.
+  Decision logic lives in evaluate() and evaluateSetup(); feedback copy lives in FB.
+-->
+<style>
+  /* Layout concept: same campus-onboarding system as Activity 1. Charcoal title bar with a red rule, light-gray
+     ground, white work surfaces. The task and materials stay in a side panel while learners decide. */
+  :root {
+    --bg: #eff0f2; --surface: #ffffff; --ink: #212326; --muted: #51565d; --line: #d2d5da;
+    --accent: #c41230; --accent-ink: #ffffff; --accent-deep: #8c0d24; --accent-soft: #f7e7ea;
+    --tile: #e9ebee; --good: #1c6a41; --good-soft: #e1f1e8; --review: #84470a; --review-soft: #fdeed8;
+    --focus: #0b5cff; --bar: #26282b; --hl: #fbdbe0;
+    --font-body: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --font-deco: "Pixelify Sans", "Courier New", monospace;
+    --radius: 12px; --radius-lg: 18px;
+    --shadow: 0 1px 2px rgba(16, 18, 24, 0.06), 0 10px 28px rgba(16, 18, 24, 0.07);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #151618; --surface: #202225; --ink: #eceef0; --muted: #aeb4bc; --line: #3a3d42;
+      --accent: #ff6b7f; --accent-ink: #1c0b0e; --accent-deep: #a8283b; --accent-soft: #2d2023;
+      --good: #84d3a6; --good-soft: #17301f; --review: #f2bb6b; --review-soft: #3a2a0f; --focus: #8db8ff; --hl: #5b2029;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #151618; --surface: #202225; --ink: #eceef0; --muted: #aeb4bc; --line: #3a3d42;
+    --accent: #ff6b7f; --accent-ink: #1c0b0e; --accent-deep: #a8283b; --accent-soft: #2d2023;
+    --good: #84d3a6; --good-soft: #17301f; --review: #f2bb6b; --review-soft: #3a2a0f; --focus: #8db8ff; --hl: #5b2029;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 1.0625rem; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1120px; margin-inline: auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  h1, h2, h3, h4 { font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; margin: 0; text-wrap: balance; }
+  p { margin: 0; }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+  h2:focus, h3:focus { outline: none; }
+  .vh { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+  svg.px { display: block; max-width: 100%; height: auto; }
+
+  /* Title bar */
+  .topbar { background: var(--bar); color: #fff; border-bottom: 3px solid var(--accent); }
+  .topbar .wrap { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 16px; align-items: center; padding-block: 10px; }
+  .brand { font-size: 1.1rem; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; row-gap: 4px; line-height: 1.25; letter-spacing: -0.01em; }
+  .brand .mark { width: 8px; height: 8px; background: #c41230; box-shadow: 12px 0 #fff, 24px 0 #9aa0a8; margin-right: 28px; flex: none; }
+  .brand small { font-weight: 600; font-size: 0.82rem; border: 1px solid #7b818a; border-radius: 999px; padding: 3px 12px; white-space: nowrap; letter-spacing: 0; }
+  .topbar-tools { display: flex; gap: 10px; align-items: center; }
+  .textsize { display: flex; align-items: center; gap: 4px; border: 1px solid rgba(255,255,255,0.4); border-radius: 10px; padding: 2px; }
+  .textsize span { font-size: 0.78rem; padding-inline: 8px 4px; color: #c9ced4; }
+  .textsize button { min-width: 44px; min-height: 40px; background: transparent; color: #fff; border: 0; border-radius: 8px; font: inherit; font-weight: 700; cursor: pointer; }
+  .textsize button:hover { background: rgba(255,255,255,0.16); }
+  .textsize button[aria-disabled="true"] { opacity: 0.4; cursor: default; }
+  .topbar :focus-visible { outline-color: #fff; }
+
+  /* Stepper (status, not buttons) */
+  .progress-bar { padding-block: 20px 4px; overflow-x: auto; }
+  .progress { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: nowrap; }
+  .progress li { display: flex; align-items: center; gap: 7px; font-size: 0.9rem; font-weight: 600; color: var(--muted); white-space: nowrap; }
+  .progress li:not(:last-child)::after { content: ""; display: block; width: 16px; height: 2px; margin: 0 8px; background: var(--line); }
+  .progress li.done { color: var(--ink); }
+  .progress li.done:not(:last-child)::after { background: var(--good); }
+  .progress li[aria-current="step"] { color: var(--ink); font-weight: 700; }
+  .progress .dot { display: grid; place-items: center; flex: none; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--line); background: var(--surface); font-size: 0.8rem; line-height: 1; }
+  .progress li.done .dot { background: var(--good); border-color: var(--good); color: var(--bg); }
+  .progress li[aria-current="step"] .dot { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+  @media (max-width: 1040px) {
+    .progress li:not([aria-current="step"]) .name { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+    .progress li:not(:last-child)::after { width: 14px; margin: 0 6px; }
+  }
+
+  main { padding-block: 24px 72px; }
+  section.stage { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+  section.stage > * { min-width: 0; max-width: 100%; }
+  .eyebrow { text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.85rem; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+  .stage h2 { font-size: clamp(1.9rem, 4.5vw, 2.6rem); letter-spacing: -0.02em; }
+  .stage h2::after { content: ""; display: block; height: 4px; width: 96px; margin-top: 12px; background: linear-gradient(90deg, var(--accent) 0 32px, var(--ink) 32px 48px, var(--line) 48px 96px); }
+  .lead { max-width: 68ch; }
+  .meta { color: var(--muted); font-size: 0.95rem; margin-top: 10px; }
+  .card-title { text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.85rem; font-weight: 700; color: var(--accent); }
+  .label { text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; font-weight: 700; color: var(--muted); }
+
+  /* Buttons */
+  .btn { font: inherit; font-weight: 600; font-size: 1rem; min-height: 48px; padding: 10px 22px; border-radius: 10px; cursor: pointer; border: 1px solid var(--accent-deep); background: var(--accent); color: var(--accent-ink); box-shadow: 0 1px 2px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.22); transition: transform 0.12s, box-shadow 0.12s; }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(196,18,48,0.28), inset 0 1px 0 rgba(255,255,255,0.22); }
+  .btn:active { transform: none; }
+  .btn.secondary { background: var(--surface); color: var(--ink); border: 1px solid var(--line); box-shadow: 0 1px 2px rgba(16,18,24,0.08); }
+  .btn.secondary:hover { background: var(--tile); color: #212326; box-shadow: 0 4px 12px rgba(16,18,24,0.1); }
+  .btn.small { min-height: 44px; padding: 6px 16px; font-size: 0.95rem; }
+  .topbar .btn.secondary { background: transparent; color: #fff; border-color: rgba(255,255,255,0.55); box-shadow: none; }
+  .topbar .btn.secondary:hover { background: rgba(255,255,255,0.14); }
+  .actions { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; padding-bottom: 3px; }
+  @media (prefers-reduced-motion: reduce) { .btn, .btn:hover { transition: none; transform: none; } }
+
+  /* Cards */
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 20px 22px; }
+  .callout { background: var(--accent-soft); border-radius: var(--radius-lg); padding: 18px 22px; display: flex; flex-direction: column; gap: 6px; }
+  .callout p { max-width: 80ch; }
+  .tile { flex: none; width: 64px; height: 64px; background: linear-gradient(160deg, #f6f7f9, #e3e6ea); border: 1px solid #d9dce1; border-radius: 14px; display: grid; place-items: center; }
+  .tile.sm { width: 52px; height: 52px; }
+  .tile svg.px { width: auto; height: auto; max-width: none; }
+  .tile.sm svg.px { transform: scale(0.8); }
+
+  /* Intro */
+  .intro-head .eyebrow { margin-bottom: 6px; }
+  .intro-lead { font-size: 1.15rem; line-height: 1.7; max-width: 60ch; }
+  .instructions { display: flex; flex-direction: column; gap: 18px; padding: 24px 26px; }
+  .how { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .how li { display: flex; gap: 16px; align-items: center; background: var(--bg); border-radius: 16px; padding: 14px 16px; }
+  .how strong { display: block; font-size: 1.15rem; letter-spacing: -0.01em; }
+  .how p { color: var(--muted); line-height: 1.45; margin-top: 2px; }
+  .instructions-foot { display: flex; gap: 20px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+  .instructions-foot p { color: var(--muted); max-width: 60ch; }
+  @media (max-width: 860px) { .how { grid-template-columns: minmax(0, 1fr); } }
+
+  /* Side-by-side: work area + materials */
+  .with-side { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 410px); gap: 28px; align-items: start; }
+  .with-side > .main { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+  .side { position: sticky; top: 12px; min-width: 0; }
+  .mat-toggle { display: none; width: 100%; justify-content: space-between; }
+  @media (max-width: 1000px) {
+    .with-side { display: flex; flex-direction: column; gap: 18px; }
+    .side { order: -1; position: static; }
+    .mat-toggle { display: flex; }
+    .side:not(.open) .mat-host { display: none; }
+  }
+
+  /* Materials viewer */
+  .mat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column; }
+  .side .mat { max-height: calc(100vh - 24px); }
+  .mat-tabs { display: flex; gap: 4px; padding: 8px 8px 0; background: var(--bg); border-bottom: 1px solid var(--line); overflow-x: auto; }
+  .mat-tab { font: inherit; font-weight: 600; font-size: 0.95rem; color: var(--muted); background: none; border: 1px solid transparent; border-bottom: 0; border-radius: 10px 10px 0 0; padding: 10px 14px; min-height: 44px; cursor: pointer; white-space: nowrap; }
+  .mat-tab:hover { color: var(--ink); }
+  .mat-tab[aria-selected="true"] { background: var(--surface); color: var(--ink); border-color: var(--line); margin-bottom: -1px; padding-bottom: 11px; }
+  .mat-tab .seen { color: var(--good); margin-left: 6px; font-weight: 700; }
+  .mat-body { padding: 18px 20px 22px; display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+  .side .mat-body { overflow: auto; }
+  .mat-body h4 { font-size: 1.1rem; }
+  .flash { outline: 3px solid var(--accent); outline-offset: 3px; background: var(--hl) !important; border-radius: 8px; }
+
+  /* Email */
+  .email { border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; background: var(--surface); }
+  .email-bar { display: flex; align-items: center; gap: 10px; padding: 8px 14px; background: linear-gradient(#f3f4f6, #e9ebee); border-bottom: 1px solid var(--line); color: #51565d; }
+  .email-bar .dots { display: flex; gap: 4px; }
+  .email-bar .dots i { width: 8px; height: 8px; background: #9aa0a8; display: block; }
+  .email-bar .dots i:first-child { background: #c41230; }
+  .email-bar .label { color: #51565d; }
+  .email dl { margin: 0; padding: 12px 16px 0; display: grid; grid-template-columns: auto 1fr; gap: 2px 14px; }
+  .email dt { color: var(--muted); font-weight: 600; }
+  .email dd { margin: 0; font-weight: 600; }
+  .email .body { padding: 12px 16px 16px; display: flex; flex-direction: column; gap: 10px; }
+  .email .body p { max-width: 68ch; }
+  .reqs ul { margin: 6px 0 8px 1.2rem; padding: 0; }
+  .reqs li { margin-bottom: 2px; }
+
+  /* Files */
+  .file { border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; background: var(--surface); }
+  .file-head { display: flex; gap: 14px; align-items: center; }
+  .file-head .tag { font-size: 0.8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .file-head h4 { word-break: break-word; font-size: 1.02rem; }
+  dl.facts { margin: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  dl.facts > div { display: flex; flex-direction: column; gap: 0; }
+  dl.facts dt { font-size: 0.85rem; font-weight: 700; color: var(--muted); }
+  dl.facts dd { margin: 0; }
+  .preview { border-top: 1px dashed var(--line); padding-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+  .fict { display: inline-block; align-self: flex-start; font-size: 0.8rem; font-weight: 700; background: var(--tile); color: #3d4147; border-radius: 6px; padding: 2px 8px; }
+  .file > .btn { align-self: flex-start; }
+  #records:focus { outline: none; }
+  .tscroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
+  table.ptable { border-collapse: collapse; width: 100%; font-size: 0.92rem; min-width: 460px; }
+  table.ptable caption { text-align: left; font-weight: 600; padding: 8px 10px; color: var(--muted); caption-side: top; }
+  table.ptable th, table.ptable td { text-align: left; padding: 8px 10px; border-top: 1px solid var(--line); vertical-align: top; }
+  table.ptable thead th { background: var(--tile); color: #212326; font-weight: 700; }
+  .doc-preview { background: var(--bg); border-radius: 10px; padding: 12px 16px; }
+  .doc-preview ol { margin: 0; padding-left: 1.3rem; display: flex; flex-direction: column; gap: 6px; }
+
+  /* Notes */
+  .notes { border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; background: var(--surface); }
+  .notes p { max-width: 70ch; padding: 2px 4px; }
+  .fine { color: var(--muted); font-size: 0.92rem; }
+
+  /* Tools */
+  .tools-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .main-view .tools-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  @media (max-width: 1000px) { .main-view .tools-grid { grid-template-columns: minmax(0, 1fr); } }
+  .tool { border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; background: var(--surface); }
+  .tool-head { display: flex; gap: 12px; align-items: center; }
+  .tool-head .tag { font-size: 0.8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .tool-head h4 { font-size: 1.02rem; }
+
+  /* Form */
+  fieldset.decision { border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow); padding: 18px 20px 20px; margin: 0; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+  fieldset.decision.needs { border-color: var(--review); box-shadow: 0 0 0 1px var(--review); }
+  fieldset.decision legend, .ws-body legend { float: left; width: 100%; padding: 0; margin: 0 0 4px; font-weight: 700; font-size: 1.05rem; }
+  fieldset.decision legend + *, .ws-body legend + * { clear: both; }
+  .dnum { display: block; font-family: var(--font-deco); font-weight: 500; font-size: 0.9rem; color: var(--accent); margin-bottom: 2px; }
+  .hint-line { color: var(--muted); font-size: 0.92rem; }
+  .need { color: var(--review); font-weight: 700; font-size: 0.92rem; }
+  .opt { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); cursor: pointer; }
+  .opt:hover { border-color: var(--ink); }
+  .opt.is-checked { border-color: var(--ink); background: var(--tile); color: #212326; box-shadow: inset 0 0 0 1px var(--ink); }
+  .opt input { width: 22px; height: 22px; margin: 1px 0 0; flex: none; accent-color: var(--accent); }
+  .opt .letter { font-weight: 700; margin-right: 6px; }
+  .opt > span { min-width: 0; overflow-wrap: anywhere; }
+  .field { display: flex; flex-direction: column; gap: 8px; }
+  .field label { font-weight: 700; }
+  textarea { font: inherit; width: 100%; min-height: 140px; padding: 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); resize: vertical; }
+  textarea[aria-invalid="true"] { border-color: var(--review); }
+  textarea:hover { border-color: var(--ink); }
+  .error { color: var(--review); font-weight: 700; }
+  .error:empty { display: none; }
+  .hint-box { background: var(--accent-soft); border-radius: var(--radius); padding: 14px 16px; }
+  .quoted { background: var(--bg); border-radius: var(--radius); padding: 12px 16px; border-left: 4px solid var(--line); white-space: pre-wrap; }
+
+  /* Feedback */
+  .crit { display: flex; flex-direction: column; gap: 10px; }
+  .crit h3 { font-size: 1.15rem; }
+  .fb-item { display: flex; flex-direction: column; gap: 8px; border-radius: 12px; padding: 12px 14px; border: 1px solid; }
+  .fb-item.review { background: var(--review-soft); border-color: var(--review); }
+  .fb-item.met { background: var(--good-soft); border-color: var(--good); }
+  .fb-row { display: flex; gap: 10px; align-items: flex-start; }
+  .chip { flex: none; font-size: 0.78rem; font-weight: 700; border-radius: 4px; padding: 2px 8px; white-space: nowrap; }
+  .review .chip { background: var(--review); color: var(--bg); }
+  .met .chip { background: var(--good); color: var(--bg); }
+  .fb-links { display: flex; flex-wrap: wrap; gap: 4px 20px; margin-left: 0; }
+  .linkbtn { font: inherit; font-weight: 600; font-size: 0.92rem; color: var(--accent); background: none; border: 0; padding: 4px 0; min-height: 32px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; text-align: left; }
+  .linkbtn:hover { text-decoration-thickness: 2px; }
+  .none { color: var(--muted); }
+  .summary-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 24px; margin: 0; }
+  .summary-grid > div { min-width: 0; }
+  .summary-grid dt { font-size: 0.85rem; font-weight: 700; color: var(--muted); }
+  .summary-grid dd { margin: 0; }
+  @media (max-width: 640px) { .summary-grid { grid-template-columns: minmax(0, 1fr); } }
+  .checks { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+  .checks label { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; }
+  .checks input { width: 22px; height: 22px; margin-top: 2px; flex: none; accent-color: var(--accent); }
+
+  /* Revision + setup */
+  .part { display: flex; flex-direction: column; gap: 16px; }
+  .part-head { display: flex; flex-direction: column; gap: 4px; }
+  .part-head .eyebrow { margin: 0; }
+  .part-head h3 { font-size: 1.5rem; }
+  .workspace { border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; background: var(--surface); box-shadow: var(--shadow); }
+  .ws-bar { display: flex; align-items: center; gap: 10px; padding: 8px 14px; background: linear-gradient(#f3f4f6, #e9ebee); border-bottom: 1px solid var(--line); color: #51565d; }
+  .ws-bar .dots { display: flex; gap: 4px; }
+  .ws-bar .dots i { width: 8px; height: 8px; background: #9aa0a8; display: block; }
+  .ws-bar .dots i:first-child { background: #c41230; }
+  .ws-bar .label { color: #51565d; }
+  .ws-body { padding: 18px 20px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 22px; }
+  .ws-body fieldset { border: 1px solid var(--line); border-radius: var(--radius); margin: 0; padding: 12px 14px 14px; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+  .ws-body fieldset.wide { grid-column: 1 / -1; }
+  .ws-body legend { font-size: 1rem; }
+  .ws-body .opt { padding: 10px 12px; }
+  .opt .sub { display: block; color: var(--muted); font-size: 0.92rem; margin-top: 2px; }
+  .opt.is-checked .sub { color: #3d4147; }
+  @media (max-width: 760px) { .ws-body { grid-template-columns: minmax(0, 1fr); } }
+  .check-row { display: flex; gap: 12px; align-items: flex-start; border-radius: 12px; padding: 12px 14px; border: 1px solid; }
+  .check-row.review { background: var(--review-soft); border-color: var(--review); }
+  .check-row.met { background: var(--good-soft); border-color: var(--good); }
+  .check-row strong { display: block; }
+  .check-row.review .chip { background: var(--review); color: var(--bg); }
+  .check-row.met .chip { background: var(--good); color: var(--bg); }
+  .status { font-weight: 700; padding: 12px 14px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); }
+  .status.ok { border-left-color: var(--good); }
+  .status:empty { display: none; }
+  .two-col { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  @media (max-width: 760px) { .two-col { grid-template-columns: minmax(0, 1fr); } }
+  .example { background: var(--surface); border: 1px solid var(--good); border-radius: var(--radius-lg); padding: 18px 22px; display: flex; flex-direction: column; gap: 10px; box-shadow: var(--shadow); }
+  .example p { max-width: 75ch; }
+
+  /* Completion + records */
+  .final-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .final-list li { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 12px; align-items: start; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+  .final-list li:last-child { border-bottom: 0; padding-bottom: 0; }
+  .final-list .k { font-weight: 700; color: var(--muted); font-size: 0.92rem; }
+  @media (max-width: 640px) { .final-list li { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
+  table.rec { border-collapse: collapse; width: 100%; font-size: 0.95rem; min-width: 560px; }
+  table.rec th, table.rec td { text-align: left; padding: 8px 10px; border-top: 1px solid var(--line); vertical-align: top; }
+  table.rec thead th { background: var(--tile); color: #212326; }
+  table.rec caption { text-align: left; font-weight: 700; padding: 8px 2px; }
+  code.topic { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.88rem; background: var(--tile); color: #212326; border-radius: 4px; padding: 1px 6px; }
+  .records { display: flex; flex-direction: column; gap: 22px; }
+
+  /* Sources panel */
+  .help { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow); margin-bottom: 22px; }
+  .help-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 20px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .help-head h2 { font-size: 1.3rem; }
+  .help-head h2::after { display: none; }
+  .help-body { padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 14px; }
+  .help-body p { max-width: 75ch; color: var(--muted); }
+  .help-links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .help-links li { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .help-links a { color: var(--accent); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+  .help-links .url { font-size: 0.85rem; color: var(--muted); overflow-wrap: anywhere; }
+</style>
+
+<header class="topbar">
+  <div class="wrap">
+    <h1 class="brand"><span class="mark" aria-hidden="true"></span><span>Student Employee Cybersecurity Onboarding Training</span> <small id="brand-activity" hidden>Tool Selection Simulation</small></h1>
+    <div class="topbar-tools">
+      <div class="textsize" role="group" aria-label="Text size">
+        <span aria-hidden="true">Text</span>
+        <button type="button" id="ts-down" aria-label="Decrease text size">A−</button>
+        <button type="button" id="ts-up" aria-label="Increase text size">A+</button>
+      </div>
+      <button type="button" class="btn secondary small" id="src-toggle" aria-expanded="false" aria-controls="src-panel">Sources</button>
+    </div>
+  </div>
+</header>
+<nav class="wrap course-navigation" aria-label="Course activities">
+  <a href="/">Activity 1 · Consequence Mapping</a>
+  <a href="/choosing-tools.html" class="course-back">← Back to Activity 2 · Choosing Among Tools</a>
+  <a href="/tool-selection.html" aria-current="page">Activity 3 · Tool Selection Simulation</a>
+</nav>
+
+
+<div class="wrap progress-bar">
+  <nav aria-label="Activity progress"><ol class="progress" id="progress"></ol></nav>
+</div>
+
+<main class="wrap" id="main">
+
+  <aside class="help" id="src-panel" aria-labelledby="src-title" hidden>
+    <div class="help-head">
+      <h2 id="src-title" tabindex="-1">Source resources</h2>
+      <button type="button" class="btn secondary small" id="src-close">Close sources</button>
+    </div>
+    <div class="help-body">
+      <p>The simulation combines summaries of CMU guidance with fictional project-specific conditions. Consult current official guidance for actual work.</p>
+      <ul class="help-links">
+        <li><a href="https://www.cmu.edu/data/guidelines/data-classification.html" target="_blank" rel="noopener noreferrer">CMU Guidelines for Data Classification<span aria-hidden="true"> ↗</span><span class="vh"> (opens in a new tab)</span></a><span class="url">https://www.cmu.edu/data/guidelines/data-classification.html</span></li>
+        <li><a href="https://www.cmu.edu/computing/services/ai/meet-ai/secure-ai.html" target="_blank" rel="noopener noreferrer">Use AI Safely at CMU<span aria-hidden="true"> ↗</span><span class="vh"> (opens in a new tab)</span></a><span class="url">https://www.cmu.edu/computing/services/ai/meet-ai/secure-ai.html</span></li>
+        <li><a href="https://www.cmu.edu/computing/services/ai/tools/chatgpt/assets/cmu_chatgpt_eula.docx.pdf" target="_blank" rel="noopener noreferrer">CMU ChatGPT Edu End User License Agreement<span aria-hidden="true"> ↗</span><span class="vh"> (opens in a new tab)</span></a><span class="url">https://www.cmu.edu/computing/services/ai/tools/chatgpt/assets/cmu_chatgpt_eula.docx.pdf</span></li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- 1. Introduction -->
+  <section class="stage" id="s-intro" aria-labelledby="t-intro">
+    <header class="intro-head">
+      <p class="eyebrow">Week 3 · AI and Third-Party Tool Risks</p>
+      <h2 id="t-intro" tabindex="-1">Choose a Workflow for a Research Summary</h2>
+      <p class="meta">Estimated time: 17 minutes</p>
+    </header>
+    <p class="intro-lead">You’re a research assistant preparing a summary for an internal lab meeting. A colleague has suggested an AI tool.</p>
+    <div class="callout" role="note">
+      <h3 class="card-title">Simulation notice</h3>
+      <p>This training uses fictional people, files, and project details. Policy summaries are adapted from CMU guidance reviewed in November 2026. For actual work, check current university requirements and the conditions governing your project. Use only the sample materials provided in this activity.</p>
+    </div>
+    <div class="card instructions">
+      <h3 class="card-title">Instructions</h3>
+      <ol class="how">
+        <li><div class="tile" data-sprite="magnifier" aria-hidden="true"></div><div><strong>Inspect</strong><p>The task, files, project notes, and tool information.</p></div></li>
+        <li><div class="tile" data-sprite="spreadsheet" aria-hidden="true"></div><div><strong>Decide</strong><p>Choose a workflow and explain your decision.</p></div></li>
+        <li><div class="tile" data-sprite="shield" aria-hidden="true"></div><div><strong>Revise</strong><p>Use the feedback to improve and apply your workflow.</p></div></li>
+      </ol>
+      <div class="instructions-foot">
+        <p>Review the task, available files, project notes, and tool information. Then choose a workflow and explain your decision. You’ll receive feedback and have an opportunity to revise.</p>
+        <button type="button" class="btn" data-go="inspect">Open the Task</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Inspect Materials -->
+  <section class="stage" id="s-inspect" aria-labelledby="t-inspect" hidden>
+    <div>
+      <p class="eyebrow">Workplace request</p>
+      <h2 id="t-inspect" tabindex="-1">Inspect the Materials</h2>
+    </div>
+    <p class="lead">Inspect the materials before building your workflow. You can return to them at any time.</p>
+    <div class="mat-host main-view" id="mat-inspect"></div>
+    <div class="actions"><button type="button" class="btn" data-go="build">Build My Workflow</button></div>
+  </section>
+
+  <!-- 3. Initial Workflow -->
+  <section class="stage" id="s-build" aria-labelledby="t-build" hidden>
+    <div>
+      <p class="eyebrow">Initial workflow</p>
+      <h2 id="t-build" tabindex="-1">Build My Workflow</h2>
+    </div>
+    <div class="with-side">
+      <div class="main">
+        <p class="lead">Choose the materials, processing environment, and output arrangements you would use now. Then explain your decision.</p>
+        <form id="form-init" novalidate></form>
+      </div>
+      <aside class="side" id="side-build" aria-label="Task and materials">
+        <button type="button" class="btn secondary mat-toggle" data-side="build" aria-expanded="false" aria-controls="mat-build"><span>Show task and materials</span><span aria-hidden="true">+</span></button>
+        <div class="mat-host" id="mat-build"></div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- 4. Feedback -->
+  <section class="stage" id="s-feedback" aria-labelledby="t-feedback" hidden>
+    <div>
+      <p class="eyebrow">Feedback</p>
+      <h2 id="t-feedback" tabindex="-1">Feedback on Your Initial Workflow</h2>
+    </div>
+    <div class="with-side">
+      <div class="main" id="fb-main"></div>
+      <aside class="side" id="side-feedback" aria-label="Task and materials">
+        <button type="button" class="btn secondary mat-toggle" data-side="feedback" aria-expanded="false" aria-controls="mat-feedback"><span>Show task and materials</span><span aria-hidden="true">+</span></button>
+        <div class="mat-host" id="mat-feedback"></div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- 5. Revision and Application -->
+  <section class="stage" id="s-revise" aria-labelledby="t-revise" hidden>
+    <div>
+      <p class="eyebrow">Revision and application</p>
+      <h2 id="t-revise" tabindex="-1">Revise and Apply Your Workflow</h2>
+    </div>
+    <div class="with-side">
+      <div class="main" id="rev-main"></div>
+      <aside class="side" id="side-revise" aria-label="Task and materials">
+        <button type="button" class="btn secondary mat-toggle" data-side="revise" aria-expanded="false" aria-controls="mat-revise"><span>Show task and materials</span><span aria-hidden="true">+</span></button>
+        <div class="mat-host" id="mat-revise"></div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- 6. Completion -->
+  <section class="stage" id="s-done" aria-labelledby="t-done" hidden>
+    <h2 id="t-done" tabindex="-1">Simulation Complete</h2>
+    <div id="done-main" style="display:flex;flex-direction:column;gap:22px"></div>
+  </section>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  /* =====================================================================
+     Pixel icons (4px cells, same sprite style as Activity 1)
+     ===================================================================== */
+  var PX = 4, NS = "http://www.w3.org/2000/svg";
+  var PAL = { k: "#2a2c30", r: "#c41230", R: "#8c0d24", w: "#ffffff", g: "#dfe2e6", G: "#9aa0a8", d: "#55595f", b: "#cfe3f4" };
+  var SPR = {
+    spreadsheet: ["kkkkkkkkkkkk", "krrrrrrrrrrk", "kwwwGwwwGwwk", "kgggGgggGggk", "kwwwGwwwGwwk", "kgggGgggGggk", "kwwwGwwwGwwk", "kgggGgggGggk", "kwwwGwwwGwwk", "kgggGgggGggk", "kwwwGwwwGwwk", "kkkkkkkkkkkk"],
+    note: ["kkkkkkkk..", "kwwwwwwkk.", "kwwwwwwkwk", "kwwwwwwkkk", "kwwwwwwwwk", "kwGGGGGwwk", "kwwwwwwwwk", "kwGGGGGGwk", "kwwwwwwwwk", "kwGGGwwwwk", "kwwwwwwwwk", "kkkkkkkkkk"],
+    envelope: ["kkkkkkkkkkkkkk", "kwwwwwwwwwwwwk", "kwrwwwwwwwwrwk", "kwwrwwwwwwrwwk", "kwwwrwwwwrwwwk", "kwwwwrwwrwwwwk", "kwwwwwrrwwwwwk", "kwwwwwwwwwwwwk", "kkkkkkkkkkkkkk"],
+    magnifier: ["..kkkk......", ".kbbbbk.....", "kbwbbbbk....", "kbwbbbbk....", "kbbbbbbk....", ".kbbbbk.....", "..kkkkkk....", ".......kdk..", "........kdk.", ".........kdk", "..........kk"],
+    shield: ["kkkkkkkkkk", "krrrrrrrrk", "krrrrrrwrk", "krrrrrwwrk", "krwrrwwrrk", "krwwwwrrrk", "krrwwrrrrk", ".krrrrrrk.", "..krrrrk..", "...kkkk..."],
+    folder: [".kkkkk........", "krrrrrkkkkkkkk", "kggggggggggggk", "kggggggggggggk", "kggggggggggggk", "kggggggggggggk", "kggggggggggggk", "kggggggggggggk", "kkkkkkkkkkkkkk"],
+    cloud: ["......kkkk......", "....kkggggkk....", "..kkggggggggggkk", ".kggggggggggggk.", "kggggggggggggggk", "kggggggggggggggk", ".kGGGGGGGGGGGGk.", "..kkkkkkkkkkkk.."],
+    bubble: [".kkkkkkkkkkkk.", "kggggggggggggk", "kggggggggggggk", "kggkggkggkgggk", "kggggggggggggk", "kggggggggggggk", ".kkkkkkkkkkkk.", "..kgk.........", "..kk.........."]
+  };
+  function sprite(name) {
+    var rows = SPR[name], w = rows[0].length, h = rows.length;
+    var svg = document.createElementNS(NS, "svg");
+    svg.setAttribute("viewBox", "0 0 " + w + " " + h);
+    svg.setAttribute("width", w * PX); svg.setAttribute("height", h * PX);
+    svg.setAttribute("shape-rendering", "crispEdges"); svg.setAttribute("class", "px");
+    svg.setAttribute("aria-hidden", "true"); svg.setAttribute("focusable", "false");
+    rows.forEach(function (row, y) {
+      var x = 0;
+      while (x < w) {
+        var c = row.charAt(x);
+        if (c === ".") { x++; continue; }
+        var x2 = x; while (x2 < w && row.charAt(x2) === c) x2++;
+        var r = document.createElementNS(NS, "rect");
+        r.setAttribute("x", x); r.setAttribute("y", y); r.setAttribute("width", x2 - x); r.setAttribute("height", 1); r.setAttribute("fill", PAL[c]);
+        svg.appendChild(r); x = x2;
+      }
+    });
+    return svg;
+  }
+
+  /* =====================================================================
+     Content
+     ===================================================================== */
+  var STAGES = [
+    { id: "intro", name: "Introduction" }, { id: "inspect", name: "Inspect Materials" }, { id: "build", name: "Initial Workflow" },
+    { id: "feedback", name: "Feedback" }, { id: "revise", name: "Revision and Application" }, { id: "done", name: "Completion" }
+  ];
+  var MAT_HOST = { inspect: "mat-inspect", build: "mat-build", feedback: "mat-feedback", revise: "mat-revise" };
+
+  var FILES = {
+    A: {
+      name: "Questionnaire_Responses.xlsx", icon: "spreadsheet",
+      facts: [["Classification recorded in the project guide", "Restricted"], ["Contents", "Participant IDs, background information, and individual written responses."], ["Location", "Project workspace."]],
+      cols: ["Participant ID", "Background", "Response"],
+      rows: [
+        ["P014", "First-year student, campus library employee", "“My evening shifts make it hard to attend the weekly study group.”"],
+        ["P027", "Graduate student, department assistant", "“I usually ask my supervisor when a work request conflicts with class.”"],
+        ["P039", "First-year student, campus dining employee", "“I would use a study group if it met after my shift.”"]
+      ]
+    },
+    B: {
+      name: "Questionnaire_Responses_No_ID.xlsx", icon: "spreadsheet",
+      facts: [["Modification", "The Participant ID column has been removed."], ["Remaining contents", "Background information and individual written responses."], ["Classification review", "No updated classification is recorded."]],
+      cols: ["Background", "Response"],
+      rows: [
+        ["First-year student, campus library employee", "“My evening shifts make it hard to attend the weekly study group.”"],
+        ["Graduate student, department assistant", "“I usually ask my supervisor when a work request conflicts with class.”"],
+        ["First-year student, campus dining employee", "“I would use a study group if it met after my shift.”"]
+      ]
+    },
+    C: {
+      name: "Questionnaire_Template.docx", icon: "note",
+      facts: [["Classification recorded in the project guide", "Public"], ["Contents", "Blank questionnaire questions."], ["Participant responses", "None."]],
+      questions: ["What makes it difficult to balance your campus job and studies?", "What support would help you?", "What do you do when work and class responsibilities conflict?"]
+    }
+  };
+
+  var NOTES = [
+    ["note-restricted", "The response file is classified as Restricted."],
+    ["note-authorized", "Authorized research assistants may review responses and prepare theme counts using the spreadsheet application inside the managed project workspace."],
+    ["note-storage", "Working files and summaries must remain in the project workspace with access limited to authorized project members."],
+    ["note-genai", "The current project documentation does not establish whether participant responses may be processed using generative AI. Changes to the processing workflow should be raised with the project lead, who will coordinate any required review."],
+    ["note-summary", "For this assignment, prepare a summary without participant IDs or identifiable quotations. Review the summary before sharing it with the project team."]
+  ];
+
+  var TOOLS = {
+    A: { title: "Personal AI account", icon: "cloud", fields: [
+      ["Environment", "A personal account with a public AI service."], ["Account", "Individual account."], ["Function", "Upload a spreadsheet and request a summary."],
+      ["Reuse", "A model-improvement setting can be switched off in this simulation."], ["Retention", "The information available here does not establish a retention period or confirm immediate deletion."],
+      ["Access", "The information available here does not fully establish provider access to uploaded content."], ["Institutional coverage", "This account is outside CMU’s protected AI environment."]] },
+    B: { title: "CMU ChatGPT Edu", icon: "bubble", fields: [
+      ["Environment", "CMU ChatGPT Edu workspace."], ["Account", "University-provided account accessed through CMU Web Login."], ["Function", "Analyze uploaded material and draft a summary."],
+      ["Reuse", "Inputs are not used to train the AI models."], ["Retention", "An exact retention period is not provided in this activity."],
+      ["Research use", "Use must comply with applicable research and data requirements. Confirm that the project permits the proposed processing."],
+      ["Access and settings", "Check the intended audience and applicable sharing and feature settings before use."]] },
+    C: { title: "Project Spreadsheet Workspace", icon: "spreadsheet", fields: [
+      ["Environment", "Spreadsheet application inside the managed project workspace."], ["Account", "University account with project access."], ["Function", "Read responses, assign theme labels, and calculate counts."],
+      ["AI processing", "No generative AI submission in this workflow."], ["Storage and access", "Working files stay in the project workspace. Access follows project permissions."],
+      ["Project use", "The project notes authorize this workflow for reviewing responses and preparing theme counts."]] }
+  };
+
+  var DECISIONS = [
+    { key: "d1", n: 1, type: "radio", q: "Which material will you use to identify themes and counts?", opts: [["A", "Questionnaire_Responses.xlsx"], ["B", "Questionnaire_Responses_No_ID.xlsx"], ["C", "Questionnaire_Template.docx"]] },
+    { key: "d2", n: 2, type: "radio", q: "Where will you process the material now?", opts: [["A", "Personal AI account, with model improvement switched off."], ["B", "CMU ChatGPT Edu, using CMU Web Login."], ["C", "Project Spreadsheet Workspace, using the documented manual workflow."], ["D", "Pause all work until the project lead replies."]] },
+    { key: "d3", n: 3, type: "radio", q: "How will you save and share the summary?", opts: [["A", "Save it in the project workspace for authorized project members."], ["B", "Save it in personal cloud storage and send a link to the lab."], ["C", "Create an “anyone with the link” copy for convenient access."]] },
+    { key: "d4", n: 4, type: "check", q: "What will you do before finalizing?", note: "Select all that apply.", opts: [["A", "Check the themes and counts against the source responses."], ["B", "Review the summary for participant IDs and identifiable quotations."], ["C", "Assume the summary is suitable to share once names have been removed."]] }
+  ];
+  function optText(key, v) { var d = DECISIONS.filter(function (x) { return x.key === key; })[0]; var o = d.opts.filter(function (x) { return x[0] === v; })[0]; return o ? o[1] : ""; }
+
+  var HINT = "Compare the file classification, the account environment, and the project’s processing instructions. Which workflow is currently supported by all three?";
+  var JUSTIFY_PROMPT = "Explain why your workflow fits the file and project requirements. Identify any uncertainty affecting the proposed AI workflow.";
+  var SELF_CHECK = ["Did you identify the file’s handling requirements?", "Did you connect your chosen environment to the project notes?", "Did you explain what remains uncertain about AI processing?"];
+  var RETENTION_CHECK = "I noted that the information available does not establish retention or provider access for the personal AI account.";
+
+  var CRITERIA = [
+    { id: "sensitivity", name: "Information sensitivity" },
+    { id: "tool", name: "Tool practices and account environment" },
+    { id: "project", name: "Project requirements and uncertainty" },
+    { id: "workflow", name: "Workflow application and access" }
+  ];
+  var TOPIC_LABEL = {
+    information_sensitivity: "Information sensitivity", account_environment: "Account environment", retention_uncertainty: "Retention uncertainty",
+    reuse_assumption: "Reuse assumption", project_permission: "Project permission", task_completion: "Task completion",
+    output_review: "Output review", storage: "Storage", access_permissions: "Access permissions"
+  };
+
+  /* Feedback catalogue. tone: review = something to revisit, met = matches the project notes. */
+  var FB = {
+    personal_ai: { crit: "tool", tone: "review", topics: ["account_environment", "reuse_assumption"], text: "You considered the reuse setting. Check the account environment and the handling requirements for the response file. Does switching off model improvement establish permission to submit this material?", links: [["tools", "tool-A", "Open Tool A"], ["files", "file-A", "Open the response file details"]] },
+    cmu_edu: { crit: "project", tone: "review", topics: ["project_permission"], text: "You selected a CMU-provided environment. Review the project notes for the remaining question about processing participant responses. What needs to be confirmed before uploading?", links: [["notes", "note-genai", "Open the Project Notes"], ["tools", "tool-B", "Open Tool B"]] },
+    noid_ai: { crit: "sensitivity", tone: "review", topics: ["information_sensitivity", "project_permission"], text: "The Participant ID column has been removed. Review what remains and whether the project has authorized this version for AI processing.", links: [["files", "file-B", "Open File B"], ["notes", "note-genai", "Open the Project Notes"]] },
+    blank: { crit: "workflow", tone: "review", topics: ["task_completion"], text: "This document can help you structure the summary. Which material contains the responses needed to identify themes and calculate counts?", links: [["files", "file-C", "Open File C"], ["request", "req-tasks", "Open the task requirements"]] },
+    paused: { crit: "project", tone: "review", topics: ["project_permission", "task_completion"], text: "You recognized an unresolved question. Review the documented workflow. Which part of the assignment can you complete while seeking clarification?", links: [["notes", "note-authorized", "Open the Project Notes"]] },
+    storage: { crit: "workflow", tone: "review", topics: ["storage"], text: "Compare the selected location with the project’s storage requirements. Where should working files and summaries remain?", links: [["notes", "note-storage", "Open the Project Notes"]] },
+    access: { crit: "workflow", tone: "review", topics: ["access_permissions"], text: "Compare this access setting with the intended audience. Who is authorized to view the summary?", links: [["request", "req-audience", "Open the task requirements"], ["notes", "note-storage", "Open the Project Notes"]] },
+    source_check: { crit: "workflow", tone: "review", topics: ["output_review"], text: "What will you check to make sure the summary accurately represents the responses?", links: [["request", "req-tasks", "Open the task requirements"], ["files", "file-A", "Open the response file"]] },
+    identify_check: { crit: "sensitivity", tone: "review", topics: ["output_review", "information_sensitivity"], text: "Review the project’s output requirements. What identifying details could remain beyond names?", links: [["notes", "note-summary", "Open the Project Notes"], ["files", "file-A", "Open the response file"]] },
+    env_ok: { crit: "tool", tone: "met", topics: ["account_environment"], text: "This environment matches the workflow documented for reviewing responses and preparing theme counts.", links: [["notes", "note-authorized", "Open the Project Notes"], ["tools", "tool-C", "Open Tool C"]] },
+    file_ok: { crit: "sensitivity", tone: "met", topics: ["information_sensitivity"], text: "Either response file can be reviewed inside the authorized Project Spreadsheet Workspace. Removing participant IDs does not, by itself, establish permission for AI processing.", links: [["notes", "note-authorized", "Open the Project Notes"]] },
+    store_ok: { crit: "workflow", tone: "met", topics: ["storage", "access_permissions"], text: "Your output location and audience match the project notes.", links: [["notes", "note-storage", "Open the Project Notes"]] },
+    checks_ok: { crit: "workflow", tone: "met", topics: ["output_review"], text: "Your checks cover both the accuracy of the counts and identifying details in the summary.", links: [["notes", "note-summary", "Open the Project Notes"]] }
+  };
+
+  var EXAMPLE_EXPLANATION = [
+    "I would use the response file in the Project Spreadsheet Workspace to identify themes and calculate counts. The project notes authorize this process for the Restricted file. I would check the results, review the summary for identifying details, and save it for authorized project members.",
+    "Before using generative AI, I would ask the project lead to confirm whether the applicable research and data requirements permit that processing. Removing IDs or choosing a CMU-provided AI account would still require checking those conditions."
+  ];
+
+  var SETUP = [
+    { key: "env", legend: "1. Processing environment", opts: [["A", "Personal AI account"], ["B", "CMU ChatGPT Edu"], ["C", "Project Spreadsheet Workspace"]] },
+    { key: "file", legend: "2. Source file", opts: [["A", "Questionnaire_Responses.xlsx"], ["B", "Questionnaire_Responses_No_ID.xlsx"], ["C", "Questionnaire_Template.docx"]] },
+    { key: "draft", legend: "3. Summary draft", wide: true, opts: [["A", "Draft A", "Presents themes and counts without participant IDs or identifiable quotations."], ["B", "Draft B", "Presents themes and counts alongside participant IDs and quotations that identify campus roles."]] },
+    { key: "dest", legend: "4a. Destination", opts: [["A", "Project workspace"], ["B", "Personal cloud storage"]] },
+    { key: "access", legend: "4b. Access", opts: [["A", "Authorized project members"], ["B", "Anyone with the link"]] }
+  ];
+  function setupText(key, v) { var s = SETUP.filter(function (x) { return x.key === key; })[0]; var o = s.opts.filter(function (x) { return x[0] === v; })[0]; return o ? o[1] : ""; }
+
+  /* =====================================================================
+     State (kept in memory on this page only)
+     ===================================================================== */
+  function blankDraft() { return { d1: "", d2: "", d3: "", d4: [], explain: "" }; }
+  var state = {
+    stage: "intro", reached: 0, size: 0, srcOpen: false,
+    mat: { tab: "request", preview: { A: false, B: false, C: false }, flash: null },
+    opened: { request: false, files: false, notes: false, tools: false, preview: { A: false, B: false, C: false } },
+    draft: blankDraft(), hintShown: false, hintUsed: false,
+    initial: null, initialItems: [], selfInitial: [false, false, false],
+    revDraft: null, revised: null, revisedItems: [], revStarted: false,
+    setup: { env: "", file: "", draft: "", dest: "", access: "" }, setupResult: null,
+    finalDraft: "", finalSubmitted: null, selfFinal: [false, false, false], retentionChecked: false,
+    log: []
+  };
+
+  /* =====================================================================
+     Helpers
+     ===================================================================== */
+  function $(s, r) { return (r || document).querySelector(s); }
+  function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+  function el(tag, attrs, kids) {
+    var n = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (k) {
+      if (k === "text") n.textContent = attrs[k]; else if (k === "class") n.className = attrs[k]; else n.setAttribute(k, attrs[k]);
+    });
+    (kids || []).forEach(function (c) { if (c == null) return; n.appendChild(typeof c === "string" ? document.createTextNode(c) : c); });
+    return n;
+  }
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  function same(a, b) { return JSON.stringify(a) === JSON.stringify(b); }
+  function complete(m) { return !!(m.d1 && m.d2 && m.d3 && m.d4.length && m.explain.trim()); }
+
+  /* =====================================================================
+     Decision logic
+     ===================================================================== */
+  function evaluate(m) {
+    var ids = [], resp = m.d1 === "A" || m.d1 === "B", ai = m.d2 === "A" || m.d2 === "B";
+    if (m.d2 === "A" && resp) ids.push("personal_ai");
+    if (m.d2 === "B" && resp) ids.push("cmu_edu");
+    if (m.d1 === "B" && ai) ids.push("noid_ai");
+    if (m.d1 === "C") ids.push("blank");
+    if (m.d2 === "D") ids.push("paused");
+    if (m.d3 === "B") ids.push("storage");
+    if (m.d3 === "C") ids.push("access");
+    if (m.d4.indexOf("A") < 0) ids.push("source_check");
+    if (m.d4.indexOf("B") < 0 || m.d4.indexOf("C") >= 0) ids.push("identify_check");
+    if (m.d2 === "C") ids.push("env_ok");
+    if (resp && m.d2 === "C") ids.push("file_ok");
+    if (m.d3 === "A") ids.push("store_ok");
+    if (m.d4.indexOf("A") >= 0 && m.d4.indexOf("B") >= 0 && m.d4.indexOf("C") < 0) ids.push("checks_ok");
+    return ids;
+  }
+  function issuesOf(ids) { return ids.filter(function (id) { return FB[id].tone === "review"; }); }
+
+  function evaluateSetup(s) {
+    var rows = [], envOk = s.env === "C", resp = s.file === "A" || s.file === "B";
+    rows.push(envOk ? { label: "Processing environment", sel: setupText("env", s.env), ok: true, topics: ["account_environment"], text: FB.env_ok.text }
+      : { label: "Processing environment", sel: setupText("env", s.env), ok: false, topics: s.env === "A" ? FB.personal_ai.topics : FB.cmu_edu.topics, text: s.env === "A" ? FB.personal_ai.text : FB.cmu_edu.text, links: s.env === "A" ? FB.personal_ai.links : FB.cmu_edu.links });
+    if (s.file === "C") rows.push({ label: "Source file", sel: setupText("file", s.file), ok: false, topics: FB.blank.topics, text: FB.blank.text, links: FB.blank.links });
+    else if (envOk) rows.push({ label: "Source file", sel: setupText("file", s.file), ok: true, topics: ["information_sensitivity"], text: "This response file can be reviewed inside the authorized Project Spreadsheet Workspace.", links: [["notes", "note-authorized", "Open the Project Notes"]] });
+    else if (s.file === "B") rows.push({ label: "Source file", sel: setupText("file", s.file), ok: false, topics: FB.noid_ai.topics, text: FB.noid_ai.text, links: FB.noid_ai.links });
+    else rows.push({ label: "Source file", sel: setupText("file", s.file), ok: false, topics: ["information_sensitivity"], text: "Check the handling requirements for this Restricted response file against the environment you selected.", links: [["files", "file-A", "Open File A"], ["notes", "note-restricted", "Open the Project Notes"]] });
+    rows.push(s.draft === "A" ? { label: "Summary draft", sel: "Draft A", ok: true, topics: ["output_review"], text: "Draft A matches the project notes: themes and counts without participant IDs or identifiable quotations.", links: [["notes", "note-summary", "Open the Project Notes"]] }
+      : { label: "Summary draft", sel: "Draft B", ok: false, topics: FB.identify_check.topics, text: FB.identify_check.text, links: FB.identify_check.links });
+    rows.push(s.dest === "A" ? { label: "Destination", sel: "Project workspace", ok: true, topics: ["storage"], text: "The project workspace is where the project notes require working files and summaries to remain.", links: [["notes", "note-storage", "Open the Project Notes"]] }
+      : { label: "Destination", sel: "Personal cloud storage", ok: false, topics: FB.storage.topics, text: FB.storage.text, links: FB.storage.links });
+    rows.push(s.access === "A" ? { label: "Access", sel: "Authorized project members", ok: true, topics: ["access_permissions"], text: "Access limited to authorized project members matches the project notes.", links: [["notes", "note-storage", "Open the Project Notes"]] }
+      : { label: "Access", sel: "Anyone with the link", ok: false, topics: FB.access.topics, text: FB.access.text, links: FB.access.links });
+    var all = envOk && resp && s.draft === "A" && s.dest === "A" && s.access === "A";
+    return { rows: rows, supported: all };
+  }
+
+  /* =====================================================================
+     Navigation, text size, sources
+     ===================================================================== */
+  function renderProgress() {
+    var ol = $("#progress"); ol.textContent = "";
+    var cur = STAGES.findIndex(function (s) { return s.id === state.stage; });
+    STAGES.forEach(function (s, i) {
+      var visited = i !== cur && (i < cur || i < state.reached);
+      var li = el("li", { class: visited ? "done" : "" });
+      li.appendChild(el("span", { class: "dot", "aria-hidden": "true", text: visited ? "✓" : String(i + 1) }));
+      li.appendChild(el("span", { class: "name", text: s.name }));
+      if (visited) li.appendChild(el("span", { class: "vh", text: " (visited)" }));
+      if (i === cur) li.setAttribute("aria-current", "step");
+      ol.appendChild(li);
+    });
+  }
+
+  function go(id, opts) {
+    opts = opts || {};
+    state.stage = id;
+    var idx = STAGES.findIndex(function (s) { return s.id === id; });
+    if (idx > state.reached) state.reached = idx;
+    STAGES.forEach(function (s) { $("#s-" + s.id).hidden = s.id !== id; });
+    $("#brand-activity").hidden = id === "intro";
+    renderProgress();
+    if (MAT_HOST[id]) buildMat(MAT_HOST[id]);
+    if (id === "feedback") renderFeedbackStage();
+    if (id === "revise") renderReviseStage();
+    if (id === "done") renderDone();
+    window.scrollTo(0, 0);
+    var h = $("#s-" + id + " h2"); if (h && !opts.noFocus) h.focus({ preventScroll: true });
+  }
+  document.addEventListener("click", function (e) { var b = e.target.closest("[data-go]"); if (b) go(b.getAttribute("data-go")); });
+
+  var SIZES = [100, 115, 130];
+  function setSize(i) {
+    state.size = Math.max(0, Math.min(SIZES.length - 1, i));
+    document.documentElement.style.fontSize = SIZES[state.size] + "%";
+    $("#ts-down").setAttribute("aria-disabled", String(state.size === 0));
+    $("#ts-up").setAttribute("aria-disabled", String(state.size === SIZES.length - 1));
+  }
+  $("#ts-down").addEventListener("click", function () { setSize(state.size - 1); });
+  $("#ts-up").addEventListener("click", function () { setSize(state.size + 1); });
+
+  function setSrc(open, silent) {
+    state.srcOpen = open; $("#src-panel").hidden = !open;
+    var t = $("#src-toggle"); t.setAttribute("aria-expanded", String(open)); t.textContent = open ? "Hide sources" : "Sources";
+    if (!silent) { if (open) $("#src-title").focus(); else t.focus(); }
+  }
+  $("#src-toggle").addEventListener("click", function () { setSrc(!state.srcOpen); });
+  $("#src-close").addEventListener("click", function () { setSrc(false); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && state.srcOpen && $("#src-panel").contains(document.activeElement)) setSrc(false); });
+
+  /* =====================================================================
+     Materials viewer (request, files, project notes, tools)
+     ===================================================================== */
+  var TABS = [["request", "Request", "Request"], ["files", "View Files", "Files"], ["notes", "Read Project Notes", "Notes"], ["tools", "Compare Tools", "Tools"]];
+
+  function facts(list) {
+    var dl = el("dl", { class: "facts" });
+    list.forEach(function (f) { dl.appendChild(el("div", {}, [el("dt", { text: f[0] }), el("dd", { text: f[1] })])); });
+    return dl;
+  }
+
+  function panelRequest(p) {
+    var email = el("div", { class: "email", "data-key": "req-email" });
+    email.appendChild(el("div", { class: "email-bar" }, [el("span", { class: "dots", "aria-hidden": "true" }, [el("i"), el("i"), el("i")]), el("span", { class: "label", text: "Message received" })]));
+    email.appendChild(el("dl", {}, [el("dt", { text: "From" }), el("dd", { text: "Alex Morgan · Research Team" }), el("dt", { text: "Subject" }), el("dd", { text: "Questionnaire summary for Friday" })]));
+    email.appendChild(el("div", { class: "body" }, [
+      el("p", { text: "Could you prepare a one-page summary of the questionnaire responses for Friday’s lab meeting? We need the three main themes and how often each came up." }),
+      el("p", { text: "I used a personal AI account for another project, and it saved a lot of time. You could try that with the questionnaire file in our project folder." })
+    ]));
+    p.appendChild(email);
+    var reqs = el("div", { class: "reqs" }, [
+      el("h4", { text: "Task requirements" }),
+      el("div", { "data-key": "req-tasks" }, [
+        el("p", { text: "Prepare a one-page internal summary that includes:" }),
+        el("ul", {}, [el("li", { text: "Three main themes." }), el("li", { text: "The number of responses associated with each theme." }), el("li", { text: "A short explanation of how you grouped the responses." })])
+      ]),
+      el("p", { "data-key": "req-audience", text: "The audience is the authorized project team." })
+    ]);
+    p.appendChild(reqs);
+    p.appendChild(el("p", { class: "fine", text: "Inspect the materials before building your workflow. You can return to them at any time." }));
+  }
+
+  function panelFiles(p, hostId) {
+    p.appendChild(el("p", { class: "fine", text: "All files and previews in this activity are fictional sample data. Open them in any order." }));
+    ["A", "B", "C"].forEach(function (id) {
+      var f = FILES[id], open = state.mat.preview[id];
+      var card = el("div", { class: "file", "data-key": "file-" + id, tabindex: "-1" });
+      var tile = el("div", { class: "tile sm", "aria-hidden": "true" }, [sprite(f.icon)]);
+      card.appendChild(el("div", { class: "file-head" }, [tile, el("div", {}, [el("span", { class: "tag", text: "File " + id }), el("h4", { text: f.name })])]));
+      card.appendChild(facts(f.facts));
+      var pid = hostId + "-pv-" + id;
+      var btn = el("button", { type: "button", class: "btn secondary small", "aria-expanded": String(open), "aria-controls": pid, "data-fk": "pv-" + id }, [open ? "Hide preview" : "Show preview", el("span", { class: "vh", text: " of " + f.name })]);
+      btn.onclick = function () { state.mat.preview[id] = !state.mat.preview[id]; if (state.mat.preview[id]) state.opened.preview[id] = true; buildMat(hostId); };
+      card.appendChild(btn);
+      var pv = el("div", { class: "preview", id: pid });
+      if (!open) pv.hidden = true;
+      else {
+        pv.appendChild(el("span", { class: "fict", text: "Fictional sample data" }));
+        if (f.cols) {
+          var table = el("table", { class: "ptable" });
+          table.appendChild(el("caption", { text: "Preview of " + f.name + ": " + f.rows.length + " sample rows" }));
+          table.appendChild(el("thead", {}, [el("tr", {}, f.cols.map(function (c) { return el("th", { scope: "col", text: c }); }))]));
+          table.appendChild(el("tbody", {}, f.rows.map(function (r) { return el("tr", {}, r.map(function (c) { return el("td", { text: c }); })); })));
+          pv.appendChild(el("div", { class: "tscroll", role: "region", "aria-label": "Preview table for " + f.name, tabindex: "0" }, [table]));
+        } else {
+          pv.appendChild(el("div", { class: "doc-preview" }, [el("ol", {}, f.questions.map(function (q) { return el("li", { text: q }); }))]));
+        }
+      }
+      card.appendChild(pv);
+      p.appendChild(card);
+    });
+  }
+
+  function panelNotes(p) {
+    var box = el("div", { class: "notes" });
+    box.appendChild(el("h4", { text: "Project Data Handling Notes" }));
+    NOTES.forEach(function (n) { box.appendChild(el("p", { "data-key": n[0], tabindex: "-1", text: n[1] })); });
+    p.appendChild(box);
+    p.appendChild(el("p", { class: "fine", text: "These are fictional project-specific conditions for the simulation. They are project notes, not a universal CMU policy." }));
+  }
+
+  function panelTools(p) {
+    p.appendChild(el("p", { class: "fine", text: "The three environments use comparable fields. Read each one before you decide." }));
+    var grid = el("div", { class: "tools-grid" });
+    ["A", "B", "C"].forEach(function (id) {
+      var t = TOOLS[id], card = el("div", { class: "tool", "data-key": "tool-" + id, tabindex: "-1" });
+      card.appendChild(el("div", { class: "tool-head" }, [el("div", { class: "tile sm", "aria-hidden": "true" }, [sprite(t.icon)]), el("div", {}, [el("span", { class: "tag", text: "Tool " + id }), el("h4", { text: t.title })])]));
+      card.appendChild(facts(t.fields));
+      grid.appendChild(card);
+    });
+    p.appendChild(grid);
+    p.appendChild(el("p", { class: "fine", text: "The model-improvement setting is a fictional feature of this simulation. The Project Spreadsheet Workspace is a fictional project environment whose permitted use is established by the Project Notes." }));
+  }
+
+  function buildMat(hostId) {
+    var host = $("#" + hostId); if (!host) return;
+    var compact = hostId !== "mat-inspect";
+    var ae = document.activeElement, fk = ae && host.contains(ae) ? ae.getAttribute("data-fk") : null;
+    host.textContent = "";
+    state.opened[state.mat.tab] = true;
+    var mat = el("div", { class: "mat" });
+    var list = el("div", { class: "mat-tabs", role: "tablist", "aria-label": "Task and materials" });
+    TABS.forEach(function (t, i) {
+      var sel = state.mat.tab === t[0];
+      var b = el("button", { type: "button", class: "mat-tab", role: "tab", id: hostId + "-tab-" + t[0], "aria-selected": String(sel), "aria-controls": hostId + "-panel-" + t[0], tabindex: sel ? "0" : "-1", "data-fk": "tab-" + t[0] });
+      if (compact) b.setAttribute("aria-label", t[1]);
+      b.appendChild(document.createTextNode(compact ? t[2] : t[1]));
+      if (state.opened[t[0]] && !sel) b.appendChild(el("span", { class: "seen", "aria-hidden": "true", text: "✓" }));
+      b.onclick = function () { state.mat.tab = t[0]; buildMat(hostId); };
+      b.onkeydown = function (e) {
+        var j = null;
+        if (e.key === "ArrowRight") j = (i + 1) % TABS.length; else if (e.key === "ArrowLeft") j = (i + TABS.length - 1) % TABS.length;
+        else if (e.key === "Home") j = 0; else if (e.key === "End") j = TABS.length - 1;
+        if (j !== null) { e.preventDefault(); state.mat.tab = TABS[j][0]; buildMat(hostId); var nt = $("#" + hostId + "-tab-" + TABS[j][0]); if (nt) nt.focus(); }
+      };
+      list.appendChild(b);
+    });
+    mat.appendChild(list);
+    TABS.forEach(function (t) {
+      var p = el("div", { class: "mat-body", role: "tabpanel", id: hostId + "-panel-" + t[0], "aria-labelledby": hostId + "-tab-" + t[0], tabindex: "0" });
+      if (state.mat.tab !== t[0]) p.hidden = true;
+      else { ({ request: panelRequest, files: panelFiles, notes: panelNotes, tools: panelTools })[t[0]](p, hostId); }
+      mat.appendChild(p);
+    });
+    host.appendChild(mat);
+    if (state.mat.flash) { var tgt = $('[data-key="' + state.mat.flash + '"]', host); if (tgt) tgt.classList.add("flash"); }
+    if (fk) { var f = $('[data-fk="' + fk + '"]', host); if (f) f.focus(); }
+  }
+
+  function setSideOpen(stage, open) {
+    var side = $("#side-" + stage); if (!side) return;
+    side.classList.toggle("open", open);
+    var t = $(".mat-toggle", side); t.setAttribute("aria-expanded", String(open));
+    t.firstChild.textContent = open ? "Hide task and materials" : "Show task and materials"; t.lastChild.textContent = open ? "−" : "+";
+  }
+  $$(".mat-toggle").forEach(function (b) { b.addEventListener("click", function () { var s = b.getAttribute("data-side"); setSideOpen(s, !$("#side-" + s).classList.contains("open")); }); });
+
+  var flashTimer = null;
+  function openMaterial(tab, target) {
+    var hostId = MAT_HOST[state.stage]; if (!hostId) return;
+    state.mat.tab = tab; state.mat.flash = target || null; state.opened[tab] = true;
+    if (target && target.indexOf("file-") === 0) { var id = target.slice(5); state.mat.preview[id] = true; state.opened.preview[id] = true; }
+    if (MAT_HOST[state.stage] !== "mat-inspect") setSideOpen(state.stage, true);
+    buildMat(hostId);
+    var host = $("#" + hostId), t = target && $('[data-key="' + target + '"]', host);
+    var focusEl = t || $("#" + hostId + "-tab-" + tab);
+    if (focusEl) { focusEl.focus({ preventScroll: true }); focusEl.scrollIntoView({ block: "center", behavior: "auto" }); }
+    clearTimeout(flashTimer);
+    flashTimer = setTimeout(function () { state.mat.flash = null; $$(".flash").forEach(function (n) { n.classList.remove("flash"); }); }, 6000);
+  }
+  function revealMaterials() {
+    var hostId = MAT_HOST[state.stage]; if (!hostId) return;
+    if (hostId !== "mat-inspect") setSideOpen(state.stage, true);
+    var tab = $("#" + hostId + "-tab-" + state.mat.tab); if (tab) { tab.focus({ preventScroll: true }); tab.scrollIntoView({ block: "start", behavior: "auto" }); }
+  }
+
+  /* =====================================================================
+     Decision form (used for the initial workflow and for the revision)
+     ===================================================================== */
+  function hintControl(idBase) {
+    var wrap = el("div", { class: "hint-wrap" });
+    var btn = el("button", { type: "button", class: "btn secondary small", "aria-expanded": String(state.hintShown), "aria-controls": idBase + "-hint" }, [state.hintShown ? "Hide hint" : "Show a hint"]);
+    var box = el("div", { class: "hint-box", id: idBase + "-hint", role: "note" }, [el("strong", { text: "Hint. " }), HINT]);
+    box.hidden = !state.hintShown;
+    btn.onclick = function () { state.hintShown = !state.hintShown; if (state.hintShown) state.hintUsed = true; btn.setAttribute("aria-expanded", String(state.hintShown)); btn.textContent = state.hintShown ? "Hide hint" : "Show a hint"; box.hidden = !state.hintShown; };
+    wrap.appendChild(el("div", { class: "actions" }, [btn]));
+    wrap.appendChild(box);
+    return wrap;
+  }
+
+  function buildForm(host, prefix, model, onChange) {
+    host.textContent = "";
+    var sets = {};
+    DECISIONS.forEach(function (d) {
+      var fs = el("fieldset", { class: "decision", "data-d": d.key });
+      var lg = el("legend", {}, [el("span", { class: "dnum", text: "Decision " + d.n }), d.q]);
+      fs.appendChild(lg);
+      if (d.note) fs.appendChild(el("p", { class: "hint-line", text: d.note }));
+      d.opts.forEach(function (o) {
+        var id = prefix + "-" + d.key + "-" + o[0];
+        var inp = el("input", { type: d.type === "radio" ? "radio" : "checkbox", id: id, name: prefix + "-" + d.key, value: o[0] });
+        var lab = el("label", { class: "opt", for: id }, [inp, el("span", {}, [el("span", { class: "letter", text: o[0] + "." }), o[1]])]);
+        function paint() { lab.classList.toggle("is-checked", inp.checked); }
+        inp.addEventListener("change", function () {
+          if (d.type === "radio") { model[d.key] = o[0]; $$('input[name="' + prefix + "-" + d.key + '"]', fs).forEach(function (i) { i.parentNode.classList.toggle("is-checked", i.checked); }); }
+          else { model.d4 = $$("input:checked", fs).map(function (i) { return i.value; }).sort(); paint(); }
+          fs.classList.remove("needs"); var nd = $(".need", fs); if (nd) nd.remove();
+          if (onChange) onChange();
+        });
+        if (d.type === "radio" ? model[d.key] === o[0] : model.d4.indexOf(o[0]) >= 0) { inp.checked = true; lab.classList.add("is-checked"); }
+        fs.appendChild(lab);
+      });
+      host.appendChild(fs); sets[d.key] = fs;
+    });
+    var field = el("div", { class: "field", "data-d": "explain" });
+    var ta = el("textarea", { id: prefix + "-explain", rows: "6", "aria-describedby": prefix + "-explain-help" });
+    ta.value = model.explain;
+    ta.addEventListener("input", function () { model.explain = ta.value; ta.removeAttribute("aria-invalid"); if (onChange) onChange(); });
+    field.appendChild(el("label", { for: prefix + "-explain", text: "Your explanation" }));
+    field.appendChild(el("p", { id: prefix + "-explain-help", class: "hint-line", text: JUSTIFY_PROMPT }));
+    field.appendChild(ta);
+    host.appendChild(field);
+    return { sets: sets, ta: ta };
+  }
+
+  function markMissing(form, model, host) {
+    var first = null;
+    DECISIONS.forEach(function (d) {
+      var missing = d.key === "d4" ? model.d4.length === 0 : !model[d.key], fs = form.sets[d.key];
+      fs.classList.toggle("needs", missing);
+      var nd = $(".need", fs); if (nd) nd.remove();
+      if (missing) { fs.insertBefore(el("p", { class: "need", text: "Answer needed" }), fs.children[1] || null); if (!first) first = fs.querySelector("input"); }
+    });
+    if (!model.explain.trim()) { form.ta.setAttribute("aria-invalid", "true"); if (!first) first = form.ta; }
+    if (first) first.focus();
+  }
+
+  /* ---------- Initial form ---------- */
+  var initForm = null;
+  function buildInitial() {
+    var host = $("#form-init");
+    var formHost = el("div", { style: "display:flex;flex-direction:column;gap:22px" });
+    host.appendChild(formHost);
+    initForm = buildForm(formHost, "init", state.draft);
+    host.appendChild(hintControl("init"));
+    var err = el("div", { class: "error", id: "init-error", role: "alert" });
+    var submit = el("button", { type: "submit", class: "btn" }, ["Review My Initial Workflow"]);
+    host.appendChild(err);
+    host.appendChild(el("div", { class: "actions" }, [submit]));
+    host.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (!complete(state.draft)) {
+        err.textContent = ""; setTimeout(function () { err.textContent = "Complete the remaining decisions and add a brief explanation before reviewing your workflow."; }, 30);
+        markMissing(initForm, state.draft); return;
+      }
+      err.textContent = "";
+      state.initial = clone(state.draft); state.initial.hintUsed = state.hintUsed; state.initial.opened = clone(state.opened);
+      state.initialItems = evaluate(state.initial);
+      state.log.push({ phase: "initial", topics: topicsOf(state.initialItems) });
+      state.revDraft = clone(state.draft); state.revStarted = false;
+      go("feedback");
+    });
+  }
+  function topicsOf(ids) { var out = []; ids.forEach(function (id) { FB[id].topics.forEach(function (t) { if (out.indexOf(t) < 0) out.push(t); }); }); return out; }
+
+  /* =====================================================================
+     Feedback rendering (shared by the feedback and revision stages)
+     ===================================================================== */
+  function itemNode(id) {
+    var f = FB[id], node = el("div", { class: "fb-item " + f.tone, "data-fb": id });
+    node.appendChild(el("div", { class: "fb-row" }, [el("span", { class: "chip", text: f.tone === "review" ? "Review" : "Matches the notes" }), el("p", { text: f.text })]));
+    if (f.links && f.links.length) {
+      var links = el("div", { class: "fb-links" });
+      f.links.forEach(function (l) { var b = el("button", { type: "button", class: "linkbtn" }, [l[2], el("span", { class: "vh", text: " in the materials panel" })]); b.onclick = function () { openMaterial(l[0], l[1]); }; links.appendChild(b); });
+      node.appendChild(links);
+    }
+    return node;
+  }
+  function renderCriteria(host, ids) {
+    host.textContent = "";
+    CRITERIA.forEach(function (c) {
+      var mine = ids.filter(function (id) { return FB[id].crit === c.id; });
+      var sec = el("section", { class: "crit card", "aria-label": c.name });
+      sec.appendChild(el("h3", { text: c.name }));
+      if (!mine.length) sec.appendChild(el("p", { class: "none", text: "No feedback was triggered for this criterion based on your selections." }));
+      mine.forEach(function (id) { sec.appendChild(itemNode(id)); });
+      host.appendChild(sec);
+    });
+  }
+  function selectionList(m) {
+    var dl = el("dl", { class: "summary-grid" });
+    DECISIONS.forEach(function (d) {
+      var txt = d.key === "d4" ? (m.d4.length ? m.d4.map(function (v) { return v + ". " + optText("d4", v); }).join(" · ") : "None selected") : m[d.key] + ". " + optText(d.key, m[d.key]);
+      dl.appendChild(el("div", {}, [el("dt", { text: "Decision " + d.n + ": " + d.q }), el("dd", { text: txt })]));
+    });
+    return dl;
+  }
+  function selfCheckNode(arr, idBase, includeRetention) {
+    var box = el("div", { class: "card", style: "display:flex;flex-direction:column;gap:12px" });
+    box.appendChild(el("h3", { class: "card-title", text: "Justification self-check" }));
+    box.appendChild(el("p", { text: "Review your explanation:" }));
+    var ul = el("ul", { class: "checks" });
+    SELF_CHECK.forEach(function (q, i) {
+      var id = idBase + "-sc" + i, inp = el("input", { type: "checkbox", id: id }); inp.checked = !!arr[i];
+      inp.onchange = function () { arr[i] = inp.checked; };
+      ul.appendChild(el("li", {}, [el("label", { for: id }, [inp, el("span", { text: q })])]));
+    });
+    if (includeRetention) {
+      var rid = idBase + "-ret", ri = el("input", { type: "checkbox", id: rid }); ri.checked = state.retentionChecked;
+      ri.onchange = function () { state.retentionChecked = ri.checked; };
+      ul.appendChild(el("li", {}, [el("label", { for: rid }, [ri, el("span", { text: RETENTION_CHECK })])]));
+    }
+    box.appendChild(ul);
+    box.appendChild(el("p", { class: "fine", text: "This activity saves your explanation but does not automatically evaluate it. These questions are for your own review." }));
+    return box;
+  }
+
+  function renderFeedbackStage() {
+    var host = $("#fb-main"); host.textContent = "";
+    if (!state.initial) { host.appendChild(el("p", { text: "Submit your initial workflow to see feedback." })); return; }
+    host.appendChild(el("p", { class: "lead", text: "Feedback is grouped by criterion and based on your structured selections. Use the links to reopen the related material, then revise your workflow." }));
+    var sum = el("div", { class: "card", style: "display:flex;flex-direction:column;gap:12px" });
+    sum.appendChild(el("h3", { class: "card-title", text: "Your initial workflow" }));
+    sum.appendChild(selectionList(state.initial));
+    sum.appendChild(el("div", {}, [el("div", { class: "label", text: "Your initial explanation" }), el("div", { class: "quoted", text: state.initial.explain })]));
+    host.appendChild(sum);
+    var crit = el("div", { style: "display:flex;flex-direction:column;gap:16px", id: "fb-crit" }); host.appendChild(crit);
+    renderCriteria(crit, state.initialItems);
+    host.appendChild(selfCheckNode(state.selfInitial, "fbs", false));
+    host.appendChild(hintControl("fb"));
+    var reopen = el("button", { type: "button", class: "btn secondary" }, ["Reopen Materials"]); reopen.onclick = revealMaterials;
+    var revise = el("button", { type: "button", class: "btn", "data-go": "revise" }, ["Revise My Workflow"]);
+    host.appendChild(el("div", { class: "actions" }, [reopen, revise]));
+  }
+
+  /* =====================================================================
+     Revision and application
+     ===================================================================== */
+  var revForm = null, revBtn = null, revResult = null;
+  function revMeets() { return issuesOf(evaluate(state.revDraft)).length === 0; }
+  function refreshRevButton() {
+    if (!revBtn) return;
+    var unchanged = same(state.revDraft, { d1: state.initial.d1, d2: state.initial.d2, d3: state.initial.d3, d4: state.initial.d4, explain: state.initial.explain });
+    var initialOk = issuesOf(state.initialItems).length === 0;
+    revBtn.textContent = initialOk && unchanged ? "Confirm My Choices" : "Save My Revisions";
+  }
+
+  function renderReviseStage() {
+    var host = $("#rev-main");
+    if (!state.initial) { host.textContent = ""; host.appendChild(el("p", { text: "Submit your initial workflow first." })); return; }
+    if (state.revStarted) return;
+    state.revStarted = true; host.textContent = "";
+
+    /* Part 1: revise */
+    var p1 = el("section", { class: "part", id: "rev-p1", "aria-labelledby": "rev-p1-t" });
+    p1.appendChild(el("div", { class: "part-head" }, [el("p", { class: "eyebrow", text: "Part 1 of 3" }), el("h3", { id: "rev-p1-t", text: "Revise Your Workflow" })]));
+    p1.appendChild(el("p", { text: "Review the feedback, reopen the materials if you need them, and change any decision or your explanation. If your initial choices already meet the criteria, confirm them to continue." }));
+    var ini = el("details", { class: "card" }, [el("summary", { text: "Your initial explanation (kept for comparison)", style: "cursor:pointer;font-weight:600" }), el("div", { class: "quoted", style: "margin-top:10px", text: state.initial.explain })]);
+    p1.appendChild(ini);
+    var fh = el("div", { style: "display:flex;flex-direction:column;gap:22px" }); p1.appendChild(fh);
+    revForm = buildForm(fh, "rev", state.revDraft, refreshRevButton);
+    p1.appendChild(hintControl("rev"));
+    var err1 = el("div", { class: "error", role: "alert" });
+    revBtn = el("button", { type: "button", class: "btn" }, ["Save My Revisions"]);
+    p1.appendChild(err1);
+    p1.appendChild(el("div", { class: "actions" }, [revBtn]));
+    revResult = el("div", { style: "display:flex;flex-direction:column;gap:14px", "aria-live": "polite" });
+    p1.appendChild(revResult);
+    host.appendChild(p1);
+    refreshRevButton();
+
+    /* Part 2: set up */
+    var p2 = el("section", { class: "part", id: "rev-p2", "aria-labelledby": "rev-p2-t", hidden: "" });
+    p2.appendChild(el("div", { class: "part-head" }, [el("p", { class: "eyebrow", text: "Part 2 of 3" }), el("h3", { id: "rev-p2-t", text: "Set Up Your Summary" })]));
+    p2.appendChild(el("p", { text: "Apply your revised decision to the simulated workspace." }));
+    var ws = el("div", { class: "workspace" });
+    ws.appendChild(el("div", { class: "ws-bar" }, [el("span", { class: "dots", "aria-hidden": "true" }, [el("i"), el("i"), el("i")]), el("span", { class: "label", text: "Simulated workspace · fictional data" })]));
+    var body = el("div", { class: "ws-body" });
+    SETUP.forEach(function (s) {
+      var fs = el("fieldset", { class: s.wide ? "wide" : "" }, [el("legend", { text: s.legend })]);
+      s.opts.forEach(function (o) {
+        var id = "setup-" + s.key + "-" + o[0], inp = el("input", { type: "radio", id: id, name: "setup-" + s.key, value: o[0] });
+        var lab = el("label", { class: "opt", for: id }, [inp, el("span", {}, [o[1], o[2] ? el("span", { class: "sub", text: o[2] }) : null])]);
+        if (state.setup[s.key] === o[0]) { inp.checked = true; lab.classList.add("is-checked"); }
+        inp.addEventListener("change", function () { state.setup[s.key] = o[0]; $$('input[name="setup-' + s.key + '"]', fs).forEach(function (i) { i.parentNode.classList.toggle("is-checked", i.checked); }); });
+        fs.appendChild(lab);
+      });
+      body.appendChild(fs);
+    });
+    ws.appendChild(body); p2.appendChild(ws);
+    var err2 = el("div", { class: "error", role: "alert" });
+    var chk = el("button", { type: "button", class: "btn" }, ["Check My Setup"]);
+    p2.appendChild(err2); p2.appendChild(el("div", { class: "actions" }, [chk]));
+    var setupOut = el("div", { style: "display:flex;flex-direction:column;gap:12px", "aria-live": "polite" }); p2.appendChild(setupOut);
+    host.appendChild(p2);
+
+    /* Part 3: final explanation */
+    var p3 = el("section", { class: "part", id: "rev-p3", "aria-labelledby": "rev-p3-t", hidden: "" });
+    p3.appendChild(el("div", { class: "part-head" }, [el("p", { class: "eyebrow", text: "Part 3 of 3" }), el("h3", { id: "rev-p3-t", text: "Explain Your Final Workflow" })]));
+    var cmp = el("div", { class: "two-col" }, [
+      el("div", {}, [el("div", { class: "label", text: "Your initial explanation" }), el("div", { class: "quoted", text: state.initial.explain })]),
+      el("div", { id: "rev-expl-saved" })
+    ]);
+    p3.appendChild(cmp);
+    var field = el("div", { class: "field" });
+    field.appendChild(el("label", { for: "final-explain", text: "Your final explanation" }));
+    field.appendChild(el("p", { class: "hint-line", id: "final-help", text: "Explain your final workflow and what you would confirm before using generative AI with these responses." }));
+    var fta = el("textarea", { id: "final-explain", rows: "6", "aria-describedby": "final-help" }); fta.value = state.finalDraft;
+    fta.addEventListener("input", function () { state.finalDraft = fta.value; fta.removeAttribute("aria-invalid"); });
+    field.appendChild(fta); p3.appendChild(field);
+    var err3 = el("div", { class: "error", role: "alert" });
+    var submitFinal = el("button", { type: "button", class: "btn" }, ["Submit My Final Workflow"]);
+    p3.appendChild(err3); p3.appendChild(el("div", { class: "actions" }, [submitFinal]));
+    var after = el("div", { style: "display:flex;flex-direction:column;gap:18px", "aria-live": "polite" }); p3.appendChild(after);
+    host.appendChild(p3);
+
+    function showPart(p) { p.hidden = false; }
+
+    revBtn.onclick = function () {
+      err1.textContent = "";
+      if (!complete(state.revDraft)) { setTimeout(function () { err1.textContent = "Complete the remaining decisions and add a brief explanation before saving."; }, 30); markMissing(revForm, state.revDraft); return; }
+      state.revised = clone(state.revDraft); state.revisedItems = evaluate(state.revised);
+      state.log = state.log.filter(function (l) { return l.phase !== "revised"; }); state.log.push({ phase: "revised", topics: topicsOf(state.revisedItems) });
+      revResult.textContent = "";
+      var issues = issuesOf(state.revisedItems);
+      revResult.appendChild(el("div", { class: "status" + (issues.length ? "" : " ok"), text: issues.length ? "Some choices still differ from the project notes (" + issues.length + " to review). You can keep revising or continue to the setup." : "Your structured choices match the project notes. Continue to set up the summary." }));
+      var list = el("div", { style: "display:flex;flex-direction:column;gap:16px" }); revResult.appendChild(list); renderCriteria(list, state.revisedItems);
+      var cont = el("button", { type: "button", class: "btn" }, ["Continue to Set Up"]); cont.onclick = function () { showPart(p2); $("#rev-p2-t").setAttribute("tabindex", "-1"); $("#rev-p2-t").focus(); $("#rev-p2").scrollIntoView({ block: "start" }); };
+      revResult.appendChild(el("div", { class: "actions" }, [cont]));
+      $("#rev-expl-saved").textContent = ""; $("#rev-expl-saved").appendChild(el("div", { class: "label", text: "Your revised explanation" })); $("#rev-expl-saved").appendChild(el("div", { class: "quoted", text: state.revised.explain }));
+      if (!state.finalDraft) { state.finalDraft = ""; }
+    };
+
+    chk.onclick = function () {
+      err2.textContent = "";
+      var missing = SETUP.some(function (s) { return !state.setup[s.key]; });
+      if (missing) { setTimeout(function () { err2.textContent = "Choose an option for every setup action before checking your setup."; }, 30); return; }
+      var res = evaluateSetup(state.setup); state.setupResult = { supported: res.supported, rows: res.rows, selections: clone(state.setup) };
+      state.log = state.log.filter(function (l) { return l.phase !== "setup"; });
+      state.log.push({ phase: "setup", topics: (function () { var t = []; res.rows.forEach(function (r) { r.topics.forEach(function (x) { if (t.indexOf(x) < 0) t.push(x); }); }); return t; })() });
+      setupOut.textContent = "";
+      setupOut.appendChild(el("div", { class: "status" + (res.supported ? " ok" : ""), text: res.supported ? "Your setup matches the workflow documented in the project notes." : "Some setup choices conflict with the project notes. Review the items marked below, change your choices, and check again." }));
+      res.rows.forEach(function (r) {
+        var row = el("div", { class: "check-row " + (r.ok ? "met" : "review") });
+        row.appendChild(el("span", { class: "chip", text: r.ok ? "Matches the notes" : "Review" }));
+        var c = el("div", {}, [el("strong", { text: r.label + ": " + r.sel }), el("span", { text: r.text })]);
+        if (r.links) { var ls = el("div", { class: "fb-links" }); r.links.forEach(function (l) { var b = el("button", { type: "button", class: "linkbtn" }, [l[2], el("span", { class: "vh", text: " in the materials panel" })]); b.onclick = function () { openMaterial(l[0], l[1]); }; ls.appendChild(b); }); c.appendChild(ls); }
+        row.appendChild(c); setupOut.appendChild(row);
+      });
+      showPart(p3);
+    };
+
+    submitFinal.onclick = function () {
+      err3.textContent = "";
+      if (!state.revised) { setTimeout(function () { err3.textContent = "Save your revisions in Part 1 before submitting your final workflow."; }, 30); return; }
+      if (!state.setupResult) { setTimeout(function () { err3.textContent = "Check your setup in Part 2 before submitting your final workflow."; }, 30); return; }
+      if (!state.finalDraft.trim()) { setTimeout(function () { err3.textContent = "Write your final explanation before submitting."; }, 30); fta.setAttribute("aria-invalid", "true"); fta.focus(); return; }
+      var first = !state.finalSubmitted;
+      state.finalSubmitted = { text: state.finalDraft, setup: clone(state.setup), supported: state.setupResult.supported };
+      submitFinal.textContent = "Update My Final Workflow";
+      after.textContent = "";
+      var ex = el("div", { class: "example" }, [el("div", { class: "label", text: "Example explanation" })]);
+      EXAMPLE_EXPLANATION.forEach(function (t) { ex.appendChild(el("p", { text: t })); });
+      ex.appendChild(el("p", { class: "fine", text: "Compare it with your explanation. Your wording can differ. Edit your explanation above and update it if you want to revise." }));
+      after.appendChild(ex);
+      after.appendChild(selfCheckNode(state.selfFinal, "fin", true));
+      var done = el("button", { type: "button", class: "btn", "data-go": "done" }, ["Complete the Simulation"]);
+      after.appendChild(el("div", { class: "actions" }, [done]));
+      if (first) { ex.setAttribute("tabindex", "-1"); ex.focus(); }
+    };
+    if (state.finalSubmitted) { p2.hidden = false; p3.hidden = false; }
+  }
+
+  /* =====================================================================
+     Completion and local records
+     ===================================================================== */
+  function finalRows() {
+    var s = state.finalSubmitted ? state.finalSubmitted.setup : state.setup, rev = state.revised || state.initial;
+    var res = state.setupResult ? state.setupResult.rows : null;
+    function ok(label) { var r = res && res.filter(function (x) { return x.label === label; })[0]; return r ? r.ok : null; }
+    return [
+      ["Processing environment", s.env ? setupText("env", s.env) : "Not set", ok("Processing environment")],
+      ["Source file", s.file ? setupText("file", s.file) : "Not set", ok("Source file")],
+      ["Summary draft", s.draft ? setupText("draft", s.draft) : "Not set", ok("Summary draft")],
+      ["Destination", s.dest ? setupText("dest", s.dest) : "Not set", ok("Destination")],
+      ["Access", s.access ? setupText("access", s.access) : "Not set", ok("Access")],
+      ["Checks before finalizing", rev && rev.d4.length ? rev.d4.map(function (v) { return optText("d4", v); }).join(" ") : "None selected", rev ? (rev.d4.indexOf("A") >= 0 && rev.d4.indexOf("B") >= 0 && rev.d4.indexOf("C") < 0) : null]
+    ];
+  }
+
+  function issueLabel(id) { return ({ personal_ai: "Personal AI account with response material", cmu_edu: "CMU-provided AI environment: project permission unresolved", noid_ai: "No-ID file submitted for AI processing", blank: "Blank questionnaire used for analysis", paused: "All work paused", storage: "Personal storage for the summary", access: "Anyone-with-the-link access", source_check: "Source check omitted", identify_check: "Identifying-content check omitted or incomplete" })[id] || id; }
+
+  function renderDone() {
+    var host = $("#done-main"); host.textContent = "";
+    var supported = state.setupResult && state.setupResult.supported;
+    host.appendChild(el("p", { class: "lead", text: supported ? "You have reviewed the data, compared tool conditions, and applied a workflow supported by the available project information." : "You have reviewed the data and compared tool conditions. Some items in your final workflow still differ from the project notes. Review them below." }));
+    var card = el("div", { class: "card", style: "display:flex;flex-direction:column;gap:14px" });
+    card.appendChild(el("h3", { class: "card-title", text: "Your final workflow" }));
+    var ul = el("ul", { class: "final-list" });
+    finalRows().forEach(function (r) {
+      var v = el("div", {}, [el("span", { text: r[1] })]);
+      if (r[2] !== null) v.appendChild(el("div", {}, [el("span", { class: "chip", style: "display:inline-block;margin-top:4px;background:" + (r[2] ? "var(--good)" : "var(--review)") + ";color:var(--bg)", text: r[2] ? "Matches the notes" : "Review" })]));
+      ul.appendChild(el("li", {}, [el("span", { class: "k", text: r[0] }), v]));
+    });
+    card.appendChild(ul);
+    if (state.finalSubmitted) card.appendChild(el("div", {}, [el("div", { class: "label", text: "Your final explanation" }), el("div", { class: "quoted", text: state.finalSubmitted.text })]));
+    host.appendChild(card);
+    var rec = el("div", { id: "records", hidden: "" });
+    var btn = el("button", { type: "button", class: "btn", "aria-expanded": "false", "aria-controls": "records" }, ["Review My Decisions"]);
+    var back = el("button", { type: "button", class: "btn secondary", "data-go": "revise" }, ["Back to My Final Workflow"]);
+    btn.onclick = function () { var open = rec.hidden; rec.hidden = !open; btn.setAttribute("aria-expanded", String(open)); btn.textContent = open ? "Hide My Decisions" : "Review My Decisions"; if (open) { renderRecords(rec); rec.setAttribute("tabindex", "-1"); rec.focus(); } };
+    host.appendChild(el("div", { class: "actions" }, [btn, back]));
+    host.appendChild(rec);
+  }
+
+  function renderRecords(host) {
+    host.textContent = ""; host.className = "records";
+    host.appendChild(el("p", { class: "fine", text: "These records stay on this page for your own review. They have not been sent to an instructor or to any other system." }));
+
+    var t1 = el("table", { class: "rec" }); t1.appendChild(el("caption", { text: "Initial and revised decisions" }));
+    t1.appendChild(el("thead", {}, [el("tr", {}, ["Item", "Initial", "Revised", "Change"].map(function (h) { return el("th", { scope: "col", text: h }); }))]));
+    var ini = state.initial, rev = state.revised, tb = el("tbody");
+    DECISIONS.forEach(function (d) {
+      function fmt(m) { if (!m) return "Not revised"; return d.key === "d4" ? (m.d4.length ? m.d4.join(", ") : "None") + ": " + m.d4.map(function (v) { return optText("d4", v); }).join(" ") : m[d.key] + ". " + optText(d.key, m[d.key]); }
+      var changed = rev && !same(ini[d.key], rev[d.key]);
+      tb.appendChild(el("tr", {}, [el("th", { scope: "row", text: "Decision " + d.n }), el("td", { text: fmt(ini) }), el("td", { text: fmt(rev) }), el("td", { text: rev ? (changed ? "Changed" : "Unchanged") : "—" })]));
+    });
+    tb.appendChild(el("tr", {}, [el("th", { scope: "row", text: "Explanation" }), el("td", { text: ini.explain }), el("td", { text: rev ? rev.explain : "Not revised" }), el("td", { text: rev ? (ini.explain === rev.explain ? "Unchanged" : "Changed") : "—" })]));
+    t1.appendChild(tb); host.appendChild(el("div", { class: "tscroll", role: "region", "aria-label": "Initial and revised decisions", tabindex: "0" }, [t1]));
+
+    var iss = issuesOf(state.initialItems), rem = rev ? issuesOf(state.revisedItems) : iss.slice();
+    var sc = el("div", { class: "card", style: "display:flex;flex-direction:column;gap:10px" });
+    sc.appendChild(el("h3", { class: "card-title", text: "Structured-choice issues" }));
+    if (!iss.length) sc.appendChild(el("p", { text: "No structured-choice issues were triggered by your initial workflow." }));
+    iss.forEach(function (id) { var r = rem.indexOf(id) < 0; sc.appendChild(el("p", {}, [el("strong", { text: (r ? "Resolved: " : "Remaining: ") }), issueLabel(id)])); });
+    rem.filter(function (id) { return iss.indexOf(id) < 0; }).forEach(function (id) { sc.appendChild(el("p", {}, [el("strong", { text: "New in revision: " }), issueLabel(id)])); });
+    if (state.setupResult) { var sr = state.setupResult.rows.filter(function (r) { return !r.ok; }); sc.appendChild(el("p", {}, [el("strong", { text: "Final workspace setup: " }), sr.length ? sr.length + " item(s) remain unresolved (" + sr.map(function (r) { return r.label; }).join(", ") + ")." : "All items match the project notes."])); }
+    else sc.appendChild(el("p", { text: "The workspace setup was not checked." }));
+    host.appendChild(sc);
+
+    var t2 = el("table", { class: "rec" }); t2.appendChild(el("caption", { text: "Feedback topics triggered" }));
+    t2.appendChild(el("thead", {}, [el("tr", {}, ["Topic", "Initial workflow", "Revised workflow", "Workspace setup"].map(function (h) { return el("th", { scope: "col", text: h }); }))]));
+    var tb2 = el("tbody");
+    function has(phase, t) { var l = state.log.filter(function (x) { return x.phase === phase; })[0]; return l ? (l.topics.indexOf(t) >= 0 ? "Triggered" : "Not triggered") : "—"; }
+    Object.keys(TOPIC_LABEL).forEach(function (t) {
+      if (t === "retention_uncertainty") {
+        tb2.appendChild(el("tr", {}, [el("th", { scope: "row" }, [el("code", { class: "topic", text: t }), " " + TOPIC_LABEL[t]]), el("td", { colspan: "3", text: state.retentionChecked ? "Self-reported: you noted that retention and provider access are not established for the personal AI account." : "Not assessed. Recognition is recorded only when you explicitly report it; nothing is inferred from which panels you opened." })]));
+      } else tb2.appendChild(el("tr", {}, [el("th", { scope: "row" }, [el("code", { class: "topic", text: t }), " " + TOPIC_LABEL[t]]), el("td", { text: has("initial", t) }), el("td", { text: has("revised", t) }), el("td", { text: has("setup", t) })]));
+    });
+    t2.appendChild(tb2); host.appendChild(el("div", { class: "tscroll", role: "region", "aria-label": "Feedback topics triggered", tabindex: "0" }, [t2]));
+
+    var mt = el("div", { class: "card", style: "display:flex;flex-direction:column;gap:8px" });
+    mt.appendChild(el("h3", { class: "card-title", text: "Other records" }));
+    function yn(b) { return b ? "Yes" : "No"; }
+    mt.appendChild(el("p", { text: "Hint used: " + yn(state.hintUsed) + ". Materials opened before the initial submission: request " + yn(ini.opened.request) + ", files " + yn(ini.opened.files) + ", project notes " + yn(ini.opened.notes) + ", tools " + yn(ini.opened.tools) + "." }));
+    mt.appendChild(el("p", { text: "Self-check (initial explanation): " + state.selfInitial.filter(Boolean).length + " of " + SELF_CHECK.length + " questions ticked. Self-check (final explanation): " + state.selfFinal.filter(Boolean).length + " of " + SELF_CHECK.length + " ticked." }));
+    host.appendChild(mt);
+  }
+
+  /* =====================================================================
+     Init
+     ===================================================================== */
+  $$("[data-sprite]").forEach(function (n) { n.appendChild(sprite(n.getAttribute("data-sprite"))); });
+  buildInitial();
+  setSize(0); setSrc(false, true);
+  go("intro", { noFocus: true });
+  window.__activity3 = { state: state, evaluate: evaluate, evaluateSetup: evaluateSetup, issuesOf: issuesOf, SPR: SPR };
+})();
+</script>
+
+</html>
